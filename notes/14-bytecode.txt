@@ -117,5 +117,47 @@ next it reads a single byte from the bytecode at the given offset. that's our op
 There isn't much going to the returrn instruciton so all it does is print the op code and then rerturn the next byte offset. other instructions will have more going on
 
 
+now that we have a rudimentary chunk structure working, let's start making it more useful. we can store code in chunks, but what about data? many values the interpreter works iwth are created at runtime as the result of operations:
+
+1 + 2
+
+The value 3 appears nowhere in the code. however the literals 1 and 2 do. To compile that statement to bytecode we need some sort of instruction that means "produce a constant" and those literal values need to get stored on the chunk soemwhere. in greenpoint, expr.literal ast node held the value. we need a different solution now that we don't have a syntax tree
+
+we won't be running any code in this chapter, but since constants have a foot in both static and dynamic worlds of our interpreter, they force us to start thinking at least a little bit about how ourr VM should represent values.
+
+For now we're going to start as simple as possible - we'll support only double-precision, floating point numbers. This will obviously expand over time, so we'll set up a new module to give ourselves room to grow
+
+This typedef abstracts how greenpoint values are concretely represented in C. That way, we can change taht representation without needing to go back and fix existing code that passes around values.
+
+back to the question where to store constants in a chunk. For small fixed-size values like integerrs, many instruction sets store the value directly in the codestream right after the opcode. these are called immediate instructions because the bits for the value are immediately after the opcode.
+
+immediate instructions - data right after opcode
+
+This doesn't work well for large or variable sized constants like strings. in a native compiler to machine code, those bigger constants get stored in a separate "contant data" reigion in the binary executable. then the instruction to load a constant has an address to where it's stored
+
+Most virtual machines do something similar. For example - the JVM associates a constant pool with each compiled class. That sounds good enough for cgreenpoint to me. Each chunk will carry with  it a list of values that appear as literals in the programs. To keep things simpler, we'll put all constants in there, even simple integers
 
 
+Value Arrays
+
+The constant pool is an array of values. The isntruction to load a constant looks up the value by index in that array. As with our bytecode array - the compiler doesn't know how big the array needs to be ahead of time.
+
+
+constant instructions
+
+we can store constants in chunks, but we also need to execute them. in a piece of code like:
+
+print 1;
+print 2;
+
+The compiled chunk needs to not only contain the values 1 and 2, but also know when to produce them so that they are printed in the right order. Thus we need an instruction that produces a particular constant
+
+When the VM executes a constant, it loads the constant for use.
+
+This new instruction is a little more complex than OP_RETURN. IN the above examplel, we load two different constants. A single barre opcode isn't enough to know which constant to load.
+
+To handle cases like these, our bytecode - like most others - allows instructions to have operands. These are stored as binary data immediately after the opcode in the input stream and let us parameterize what the instruction does.
+
+Each opcode determines how many operand bytes it has and what they mean. For example, a simple operation like "return" may have no operands, where an instruction for "load local variable" needs an operand to identify which variable to load. Each time we add a new oopcode to cgreenpoint, we specify what its operands look like - it's instruction format.
+
+In this case, OP_CONSTANT takes a singel byte operand that specifies which constant to load from the chunk's constant array. Since we don't have a compiler yet, we hand compile an instruction in our test chunk.
