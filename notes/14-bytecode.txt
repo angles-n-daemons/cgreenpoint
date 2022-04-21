@@ -1,0 +1,90 @@
+We already have ourselves a complete implementation of greenpoint, so why isn't the book over yet? It's because greenpoint relies on the JVM to do lots of things for us. If we want to underrstand how an interpreter works all the way to the metal, we need to build those bits and pieces ourselvess.
+
+An even more fundamental reason that greenpoint isn't sufficient is because it's too slow. A tree-walk interpreter is fine for some kinds of high level declarative langauges. But for a general purpose, imperitive language - even scripting languages it won't fly
+
+We could tune it all we want, but the design of walking the AST is fundamentally wrong. We can't micro optimize it to the point that we want.
+
+Let's rethink our core model. This chapter introduces that model, bytecode and begins our new interpreter - cgreenpoint
+
+
+## bytecode
+
+In engineering, it's tough to go without trade offs. To understand why we're doing it - let's look at the alternatives
+
+Walking the AST
+benefits
+- Well, we already have this. The other reason we don't want to do it is it's really simple to implement. The runtime representation of the code directly maps to the syntax. it's effortless to get from parser to the data structures we need at runtime
+- it's portable. because it's on the JVM, it can run in any platform java supports. We could write a new c implementation but need to compile it to every system we need it to run on
+
+These are the benefits, but it's not memory efficient. Each piece of syntax becomes an AST Node. A tiny lox expression like 1 + 2 turns into a whole heap of objects with various properties
+
+Each pointer adds an extra 32 or 64 bites of overhead to the object. Worse, sprinkling our data across the heap in a loosely connected web of objects is bad for spatial locality
+
+Modern CPUs process data way faster they they can pull them from RAM. To compensate, chips have multiple layers of caching. if a piece of memory is in the cache, it can be loaded up to 100x faster than from memory.
+
+How does that data get into the cache however? The machine speculates stuff in there. It's heuristic is pretty simple. Whenever the CPU reads a bit of data from RAM, it pulls in a whole bundle of adjacent bytes and stuffs them in the cache.
+
+If our prrogram next requests soe data close enough to be in that cache line, our CPU runs like a well oiled conveyor belt in a factorry. we really wanna take advantage of this.
+
+To use the cache effectively, the way we represent code in memory should be dense and ordered like its read
+
+Our AST walker has other overhead too around interface dispatch and visitor pattern, but the locality issues are enough to justify a better code representation
+
+Compiling to Native Code??
+
+If you want to go really fast, you want all of those layers of indirection out of the way. All the way down to the metal, machine code. It even sounds fast. Machine code
+
+Compiling to the instruction set the chip supports is what the fastest langauges do. Targeting native code has always been the most efficient option.
+
+If you've never written any machine code, or assembly code before - here's a gentle introduction.
+
+Native code is a dense series of operations encoded directly in binary. Each instruction is between one and a few bytes long and is super low level. Add two numbers, move memorry from here to here
+
+The CPU cranks through these instructions, decoding and executing each one in order. There is no tree structure like in our AST, and control flow is handled by jumping fro one point in the code to another. No indirection, no overhead, no skipping or chasing pointers.
+
+It's fast, but comes at a cost. FIrst is that compiling to machine code is not easy. Modern instruction sets are super complex.
+
+Second is it's not portable. If you wanna compile on a different machine, you need to write a new compilation back end
+
+what is bytecode?
+
+fix those two points in your mind. on one end, a tree walk interpreter is simple, portable and slow. native code is complex, platform specific but fast. bytecode sits in the middle. it retains the portability of a tree walker (we don't have to write assembly) but sacrifices some simplicity to get a performance boost.
+
+Structurally, bytecode represents machine code. It's a dense linear sequence of binary instructions. that keeps overhead low and plays nice with the cache. that being said, it's a simpler, higher level instruction set than any real chip out there. In bytecode formats, instructions are usually just a byte long
+
+Imagine you're writing a native compiler from some source language and you're given carte blance to define the easiest possible architecture to target. bytecode is kinda like that. It's a fantasy instruction set that makes your life as the compiler wirter easierr.
+
+The problem with fantasies is that they don't exist. We solve this by writing an emulator - a simulated chip written in software that interprets the bytecode one instruction at a time. A virtual machine
+
+The emulation layer adds overhead, which is why bytecode is slower - but adds portablility. Write our VM in a langauge like C that is already supported on all machines and we can run our emulator on top of any hardware we like.
+
+this is what we'll do with cgreenpoint. we'll follow things like python, ruby, lua, ocaml, erlang, and others.
+
+our vm will parrallel the structure of our previous design:
+
+greenpoint                 cgreenpoint
+parserr										 compiler
+   v													v
+syntax trees							 bytecode
+   v													v
+interpreter								virtual machine
+
+Of course, we won't implmement the phases strictly in order. Like our previous interpreter, we'll bounce arround, building up one language feature at a time. in this chapter, we'll get the skeleton of the application in place and create the data structures needed to store and represent a chunk of bytecode.
+
+
+We're going to create a chunk file, which has an enum to represent instructions and a chunk type. A chunk type is a wrapper around an array of data. Dynamic arrays are useful because they provide cache friendly, dense storage - constant time look up - constant time appending to the end of the array
+These features are why dynamic arrays are used all over the place in cgreenpoint
+
+Now that we're in c we get to roll our own.
+
+Dynamic arrays are pretty simple, In addition to the array itself, we keep two numbers: the number of elements in the array we've allocated ("capacity") and how many are actually used ("count")
+
+When we add an element, if the count is less than the capactiy, then there's space for it it in the array. We store an element and bump the count
+
+If we have no capacity, we have to allocate new data, copy the data over to the new array and free the existing array before adding the new data
+
+We have our struct ready, so let's implement the functions to work with it. C doesn't have constructors, so we declarre a function to init a new chunk
+
+Copying the existing elements when you seems like it's O(n) (yah) not constant time. However if you continue to grow the capacity by the current size (ie double each time you need more space) - it averages out to constant time over time
+
+The dynamic array starts off completely empty. We don't even allocate a raw array yet. To append a byte to the end of a chunk, we use a new function.

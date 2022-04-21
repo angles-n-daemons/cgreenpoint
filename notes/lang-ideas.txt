@@ -1,0 +1,3 @@
+fair f(x: int, y: int): int {
+	x = 
+}
