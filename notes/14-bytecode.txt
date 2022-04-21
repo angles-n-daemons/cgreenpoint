@@ -88,3 +88,34 @@ We have our struct ready, so let's implement the functions to work with it. C do
 Copying the existing elements when you seems like it's O(n) (yah) not constant time. However if you continue to grow the capacity by the current size (ie double each time you need more space) - it averages out to constant time over time
 
 The dynamic array starts off completely empty. We don't even allocate a raw array yet. To append a byte to the end of a chunk, we use a new function.
+
+# disassembling chunks
+
+now that we have a little module for creating chunks of bytecode
+
+let's try it out
+
+how do we know what's happening?
+
+all we've done is push some bytes around in memory. we have no human friendly way to see what's actually inside that chunk we made
+
+To fix this we're going to create a siassembler. An assembler is an old school program that takes a human rreadable mnemonic names for CPU instructions like ADD and MULT and translates them to their binary machine equivalent. a disassembler goes in the opposite direction - given a blob of achine code, it spits out a textual listing of instructions.
+
+We'll implement something similar. Given a chunk - it will print out all the instructions on it. A lox user won't use this, but Lox maintainers will benefit because we get a window into the interpreters internal representation of code.
+
+in main(), after we create the chunk we'll pass it to the disassembler
+
+to disassemble a chunk, we print a little header (so we can tell which chunk we're looking at) and then crank through the bytecode, disassembling each instruction. the way we iterate through the code is a little odd. instead of incrementing i in the loop, we let disassembleinstruction do it for us. when we call that function, after disassembling the instruction at the given offset, it returns the offset at the next instruction. this is because we'll see that instructions have different sizes
+
+The core of the debug module is this function:
+
+first it prints the byte offset of the instruction (telling us where it is in the chunk) this is going to be a helpful signpost when we start doing control flow and jump around in the bytecode
+
+next it reads a single byte from the bytecode at the given offset. that's our opcode. we switch on that. for each kind of instruction, we dispatch to a little utility function for displaying it. just in case the byte doesn't look like anything we know, we print that too (likely a bug)
+
+
+There isn't much going to the returrn instruciton so all it does is print the op code and then rerturn the next byte offset. other instructions will have more going on
+
+
+
+
