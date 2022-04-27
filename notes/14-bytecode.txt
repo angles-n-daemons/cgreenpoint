@@ -161,3 +161,62 @@ To handle cases like these, our bytecode - like most others - allows instruction
 Each opcode determines how many operand bytes it has and what they mean. For example, a simple operation like "return" may have no operands, where an instruction for "load local variable" needs an operand to identify which variable to load. Each time we add a new oopcode to cgreenpoint, we specify what its operands look like - it's instruction format.
 
 In this case, OP_CONSTANT takes a singel byte operand that specifies which constant to load from the chunk's constant array. Since we don't have a compiler yet, we hand compile an instruction in our test chunk.
+
+
+# Line information
+
+Chunks contain almost all of the information that the runtime needs from the user's source
+
+It's kind of crrazy to think that we can rreduce all the different AST classes that we created in greenpoint down to an array of bytes and array of constants
+
+There's on piece of data we're missing - we need it even though we hope the user neverr sees it
+
+When runtime errors occur, we show the user the line number of the offending source code. In jlox, those numbers live in tokens which we in turn store in the AST nodes. We need a different solutionf for clox now that we've ditched syntax trees in favor of bytecode.
+
+Given any bytecode instruction, we need to be able to determine the line of the user's source program that it was compiled from
+
+There are lots of clever ways to encode this, I took the simplest approach I could come up with even though it's embarassingly inefficient with memory. In the chunk, we store a separate array of integers parallel to the bytecode. When runtime errors occur, we look up the line number at the same index.
+
+There's a benefit to this, because the array is separate - the value is only pulled up if there's an error. This saves space in the compact encoding that out code takes
+
+We add this array to chunk, and everywhere chunk is used
+
+okay so this works
+
+once we have a real front end the compiler will track the current line as it parses and pass that in
+
+now that we have line information for every instruction, lets put it to good use
+
+in our disassembler, it's helpful to show which source line each instruction was compiled from
+
+Bytecode instructions tend to be pretty fine grained. A single line of source generally translates to a whole sequence of instructions. To make that clear, we show a | for instructions that occur on the same line as the previous one
+the result output looks like:
+
+== test chunk ==
+0000  123 OP_CONSTANT         0 '1.2'
+0002    | OP_RETURN
+
+
+we have a three byte chunk. the first two bytes are a constant instruction that loads 1.2 from the chunks constant pool, the first byte is the op constant opcode and the second is the index in the constant pool.
+
+the third byte is a single byte return instruction
+
+In the remaining chapters, we'll flesh this out with lots more kinds of instructions. the basic structure is here though, everything we need to completely represent an executable piece of code at runtime in our virtual machine. remember the whole family of AST classes we defined in greenpoint? in cgreenpoint we've reduced that down to three arrays:
+
+1. bytes of code,
+2. constant values
+3. line information for debugging
+
+this reduction is a key reason why our new interpreter will be faster than greenpoint. you can think of bytecode as a compact serialization of the ast. highly optimized for how the interpreter will deserialize it in the order it needs as it executes
+
+in the next chapter we'll see how the virutal machine does exactly that
+
+Challenges:
+
+1. Our encoding of line information is hilariously wasteful of memory. Given that a series of instructions often correspond to the same source line, a natural solution is something akin to run-length encoding of the lines
+
+run-length encoding is a form of lossless data compression in which runs of data (sequences in which the same data value occurs in many consecutive data elements) are stored as a single data value and count - rather than the original run. this is most efficient on data that contains many runs, for example simple graphic images such as icons, line drawings, etc.
+
+For files that don't have many runs, RLE could increase file size
+
+Devise an encoding that compresses the line information for a series of instructions on the same line. Change writeChunk to wrrite this compressed form, and implmement a getLIne function that given the index of an instruction determines the line where the instruction occurs.
