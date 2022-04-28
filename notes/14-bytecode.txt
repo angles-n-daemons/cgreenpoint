@@ -246,3 +246,34 @@ Okay how should I have done the line changes?
 
 I could have kept track of line counts
 Disassembly becomes messy though in that case
+
+
+how does realloc work?
+
+- realloc(ptr, size)
+
+   if pointer == null
+      return malloc(size);
+
+   size oldsize = malloc_getsize(ptr)
+
+   // are we shrinking? thats easy
+   if (size < oldsize) {
+      malloc_setsize(ptr, size);
+      return ptr;
+   }
+
+   //can we grow the allocation in place?
+   if (malloc_can_grow(ptr, size)) {
+      malloc_setsize(ptr, size)
+      return ptr
+
+   }
+
+   void nptr = malloc(size)
+   if newptr == NULL
+      return NULL
+   
+   memcpy(newptr, ptr, oldsize);
+   free(ptr);
+   return newptr;
