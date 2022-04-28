@@ -14,7 +14,7 @@ typedef struct {
     int count;
     int capacity;
     uint8_t* code;
-    LineInfo lines;
+    int* lines;
     ValueArray constants;
     // TODO: add line info
 } Chunk;
