@@ -1,21 +1,10 @@
 #include "common.h"
-#include "chunk.h"
+#include "vm/chunk.h"
 #include "debug.h"
+#include "test/vm/test_chunk.h"
 
 int main(int argc, const char* argv[]) {
-	Chunk chunk;
-	initChunk(&chunk);
-	int constant = addConstant(&chunk, 1.2);
-	int constant2 = addConstant(&chunk, 5.3);
-
-	writeChunk(&chunk, OP_CONSTANT, 1);
-	writeChunk(&chunk, constant, 1);
-	writeChunk(&chunk, OP_CONSTANT, 3);
-	writeChunk(&chunk, constant2, 3);
-	writeChunk(&chunk, OP_RETURN, 5);
-
-	disassembleChunk(&chunk, "hello");
-	freeChunk(&chunk);
-
+	testChunk();
+	printf("all tests pass\n");
 	return 0;
 }

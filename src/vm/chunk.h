@@ -1,12 +1,13 @@
 #ifndef cgreenpoint_chunk_h
 #define cgreenpoint_chunk_h
 
-#include "common.h"
-#include "line_info.h"
+#include "../common.h"
+#include "../line_info.h"
 #include "value.h"
 
 typedef enum {
     OP_CONSTANT,
+    OP_CONSTANT_16,
     OP_RETURN,
 } OpCode;
 
@@ -22,6 +23,7 @@ typedef struct {
 void initChunk(Chunk* chunk);
 void freeChunk(Chunk* chunk);
 void writeChunk(Chunk* chunk, uint8_t byte, int line);
+void writeConstant(Chunk* chunk, Value value, int line);
 int addConstant(Chunk* chunk, Value value);
 
 #endif

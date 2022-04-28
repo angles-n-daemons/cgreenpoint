@@ -1,7 +1,7 @@
 #ifndef cgreenpoint_value_h
 #define cgreenpoint_value_h
 
-#include "common.h"
+#include "../common.h"
 
 typedef double Value;
 

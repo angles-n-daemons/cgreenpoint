@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
 #include "chunk.h"
-#include "line_info.h"
-#include "memory.h"
+#include "../line_info.h"
+#include "../memory.h"
 #include "value.h"
 
 void initChunk(Chunk* chunk) {
@@ -32,6 +32,23 @@ void writeChunk(Chunk* chunk, uint8_t byte, int line) {
 
     chunk->code[chunk->count] = byte;
     chunk->count++;
+}
+
+void writeConstant(Chunk* chunk, Value value, int line) {
+    int count = chunk->count;
+    int constant = addConstant(chunk, value);
+    bool shouldUse16 = constant > 255;
+    if (shouldUse16) {
+        uint8_t firstByte = constant & 0xff;
+        uint8_t secondByte = (constant >> 8) & 0xff;
+
+	      writeChunk(chunk, OP_CONSTANT_16, line);
+	      writeChunk(chunk, firstByte, line);
+	      writeChunk(chunk, secondByte, line);
+    } else {
+	      writeChunk(chunk, OP_CONSTANT, line);
+	      writeChunk(chunk, constant, line);
+    }
 }
 
 int addConstant(Chunk* chunk, Value value) {
