@@ -10,15 +10,13 @@ typedef enum {
     OP_RETURN,
 } OpCode;
 
-// Note: I tried to do an efficient line info implementation at the commit 78ec88764cce29a7b23e604104b42a6b583b6399
-// it worked, but it scared the shit out of me
-
 typedef struct {
     int count;
     int capacity;
     uint8_t* code;
-    int* lines;
+    LineInfo lines;
     ValueArray constants;
+    // TODO: add line info
 } Chunk;
 
 void initChunk(Chunk* chunk);

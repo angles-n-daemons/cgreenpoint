@@ -5,16 +5,14 @@
 int main(int argc, const char* argv[]) {
 	Chunk chunk;
 	initChunk(&chunk);
+	int constant = addConstant(&chunk, 1.2);
+	int constant2 = addConstant(&chunk, 5.3);
 
 	writeChunk(&chunk, OP_CONSTANT, 1);
-	int constant = addConstant(&chunk, 1.2);
 	writeChunk(&chunk, constant, 1);
-
 	writeChunk(&chunk, OP_CONSTANT, 3);
-	int constant2 = addConstant(&chunk, 5.3);
 	writeChunk(&chunk, constant2, 3);
-
-	writeChunk(&chunk, OP_RETURN, 3);
+	writeChunk(&chunk, OP_RETURN, 5);
 
 	disassembleChunk(&chunk, "hello");
 	freeChunk(&chunk);

@@ -2,8 +2,8 @@
 
 #include "debug.h"
 
-int getLineOffset(LineInfo* lines, int offset, int line_count) {
-    if (line_count == lines->line_counts[offset]) {
+int getLineOffset(Chunk* chunk, int offset, int line_count) {
+    if (line_count == chunk->lines.line_counts[offset]) {
         return offset+1;
     }
     return offset;
@@ -23,8 +23,19 @@ void printLineInfo(LineInfo* lines) {
 void disassembleChunk(Chunk* chunk, const char* name) {
     printf("== %s ==\n", name);
 
+    int line_offset = 0;
+    int line_count = 0;
     for (int offset = 0; offset < chunk->count;) {
-        offset = disassembleInstruction(chunk, offset);
+        int old_offset = offset;
+        offset = disassembleInstruction(chunk, offset, line_offset);
+        line_count += offset - old_offset;
+
+        int new_line_offset = getLineOffset(chunk, line_offset, line_count);
+
+        if (new_line_offset != line_offset) {
+            line_offset = new_line_offset;
+            line_count = 0;
+        }
     }
 }
 
@@ -41,17 +52,17 @@ static int constantInstruction(const char* name, Chunk* chunk, int offset) {
     return offset + 2;
 }
 
-void printLineNum(int* lines, int offset) {
-    if (offset > 0 && lines[offset] == lines[offset-1]) {
+void printLineNum(LineInfo* lines, int offset) {
+    if (offset > 0 && lines->line_nums[offset] == lines->line_nums[offset-1]) {
         printf("   | ");
     } else {
-        printf("%4d ", lines[offset]);
+        printf("%4d ", lines->line_nums[offset]);
     }
 }
 
-int disassembleInstruction(Chunk* chunk, int offset) {
+int disassembleInstruction(Chunk* chunk, int offset, int line_offset) {
     printf("%04d ", offset);
-    printLineNum(chunk->lines, offset);
+    printLineNum(&chunk->lines, line_offset);
 
     uint8_t instruction = chunk->code[offset];
     switch(instruction) {
