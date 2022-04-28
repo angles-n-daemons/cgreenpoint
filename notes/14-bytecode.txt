@@ -220,3 +220,29 @@ run-length encoding is a form of lossless data compression in which runs of data
 For files that don't have many runs, RLE could increase file size
 
 Devise an encoding that compresses the line information for a series of instructions on the same line. Change writeChunk to wrrite this compressed form, and implmement a getLIne function that given the index of an instruction determines the line where the instruction occurs.
+
+
+----
+
+because OP_CONSTANT uses a single byte for its operand, a chunk may only contain up to 256 constants. that's small enough that people writing real world code will hit that limit. we could use two or more bytes to store the operand, but that makes every constant instruction take up more space. most chunks wont need that many unique constants so that wastes space and sacrifices some locality in the common case to support the rare case.
+
+
+To balance those two competing aims, many instruction sets feature multiple instructions that perform the same operation but with operands of different sizes.
+
+Leave our existing one-byte OP_CONSTANT instruction alone, and define a second OP_CONSTANT_LONG instruction. It stores the operand as a 24 bit number which should be plenty.
+
+Implement this function:
+
+void writeConstant(Chunk* chunk, Value value, int line);
+
+It adds value to the chunks constant array and then writes an appropriate instruction to load the constant.
+
+Also add suport to the disassembler for OP_CONSTANT_LONG instructions.
+
+Defining two instructions seems to be the best of both worlds. What sacrifices if any does it force on us?
+
+
+Okay how should I have done the line changes?
+
+I could have kept track of line counts
+Disassembly becomes messy though in that case
