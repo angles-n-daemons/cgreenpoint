@@ -5,5 +5,6 @@
 
 void disassembleChunk(Chunk* chunk, const char* name);
 int disassembleInstruction(Chunk* chunk, int offset, int line_offset);
+int getLineOffset(Chunk* chunk, int offset, int count);
 
 #endif

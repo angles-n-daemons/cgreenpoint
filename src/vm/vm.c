@@ -1,4 +1,5 @@
 #include "../common.h"
+#include "../debug.h"
 #include "vm.h"
 
 VM vm;
@@ -15,7 +16,22 @@ static InterpretResult run() {
 #define READ_BYTE() (*vm.ip++)
 #define READ_CONSTANT() (vm.chunk->constants.values[READ_BYTE()])
 #define READ_CONSTANT_16() (vm.chunk->constants.values[(READ_BYTE()) + (READ_BYTE() << 8)])
+    uint8_t* last_ip = vm.ip;
+    int line_count = 0;
+
     for (;;) {
+
+#ifdef DEBUG_TRACE_EXECUTION
+        line_count += vm.ip - last_ip;
+        int new_line_offset = getLineOffset(vm.chunk, vm.line_offset, line_count);
+        if (new_line_offset != vm.line_offset) {
+            vm.line_offset = new_line_offset;
+            line_count = 0;
+        }
+        disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code), vm.line_offset);
+        last_ip = vm.ip;
+#endif
+
         uint8_t instruction;
         switch (instruction = READ_BYTE()) {
             case OP_CONSTANT: {

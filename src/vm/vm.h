@@ -6,6 +6,8 @@
 typedef struct {
     Chunk* chunk;
     uint8_t* ip;
+    int line_offset;
+    int line_count;
 } VM;
 
 typedef enum {

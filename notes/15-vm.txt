@@ -26,3 +26,17 @@ so far we handle only a single instruction: OP_RETURN and the only thing it does
 eventually that'll be used to return from the current lox function, but we don't have functions yet so we'll repurpose it temporarily to end the execution
 
 Let's go ahead and supoprt our one other instruction
+
+If you run cgreenpoint now, it executes the chunk we hand authored in the last chapter and spits out 1.2 to your terminal.
+
+we can see it's working but that's  only because our implemntation of OP_CONSTANT has temporary code to log the value
+
+once the instruction is doing what it's supposed to, and plumbing that constant along to other ops that want to consume it - the vm will become a black box
+
+that will make our lives harrder
+
+to help ourselves out, now is a good time to add some diagnostic logging to the vm like we did with the chunks themselves. in fact we'll even reuse the same code
+
+we don't want this logging enabled all the time - it's just for us v hackers not lox users so first we create a flag to hide it behind
+
+
