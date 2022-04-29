@@ -1,3 +1,5 @@
 fair f(x: int, y: int): int {
 	x = 
 }
+
+fair(1, 5)

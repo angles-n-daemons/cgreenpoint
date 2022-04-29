@@ -1,0 +1,28 @@
+run is the most important function in the vm
+
+it's pretty simple, there's an outer loop that reads an executes single byte instructions
+
+to process an instruction, we first find out what kind of instruction we're dealing with
+
+READ_BYTE reads the first byte currently pointed at by ip and then advances the instruction pointer
+
+the first byte of any instruction is the opcode
+
+given a numeric opcode, we need to get to the right C code that implements that instructions semantics. this process is called decoding or dispatching the instruction.
+
+
+we do that for every singel instruciton, every single time one is exeucted, so this is the most performance critical part of the entire virtual machine
+
+programming language lore is filled with clever techniques to do bytecode dispatch efficiently, going all the way back to the early days of computers
+
+alas the fastest solutions require either non-standard extensions to c or handwritten assembly
+
+for cgreenpoint we'll keep it simple, just like our disassembler we have a giant switch statement with a case for each opcode
+
+the body of each case implements that opcode's behavior
+
+so far we handle only a single instruction: OP_RETURN and the only thing it does is exit the loop entirely
+
+eventually that'll be used to return from the current lox function, but we don't have functions yet so we'll repurpose it temporarily to end the execution
+
+Let's go ahead and supoprt our one other instruction

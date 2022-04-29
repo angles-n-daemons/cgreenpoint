@@ -51,16 +51,6 @@ void testConstant16() {
 	derp += (secondByte << 8);
 	printf("%d derp\n", derp);
 
-	//for(int i=0; i < 300; i++) {
-	//	Value expected = (double)i;
-	//	int location = (int)chunk.code[i * 2 + 1];
-	//	Value value = chunk.constants.values[location];
-	//	if (value != expected) {
-	//		printf("failed testConstant: expected %f but got %f\n", expected, value);
-	//		exit(1);
-	//	}
-	//}
-
 	freeChunk(&chunk);
 }
 
