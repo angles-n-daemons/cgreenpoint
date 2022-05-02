@@ -39,4 +39,19 @@ to help ourselves out, now is a good time to add some diagnostic logging to the 
 
 we don't want this logging enabled all the time - it's just for us v hackers not lox users so first we create a flag to hide it behind
 
+$ a value stack manipulator
+
+In addition to imperative side effects, lox has expresions that produce, modify and consume values. Therefore our compiled code needs way to shuttle values
+
+for example: print 3-2
+
+we obviously need instructions for 3 and 2, the print statement and the subtraction. how does the subtraction instruction know that 3 is the minus end and the 2 is the subtrahend? how does the print instruction know to use the result
+
+fun echo(n) {
+  print n;
+	return n;
+}
+
+print (echo(echo(1) + echo(2)) + echo((echo(4) + echo(5))))
+
 
