@@ -54,4 +54,38 @@ fun echo(n) {
 
 print (echo(echo(1) + echo(2)) + echo((echo(4) + echo(5))))
 
+so we don't have to move the elements, we use the 0th index of the stack as the bottom, and simply move the pointer for the top
 
+the implementation has the stack top pointer past the actual top element (therefore an empty stack has the stacktop pointer at 1  
+
+stack tracing
+
+We have a working stack, but it's hard to see it's working
+
+when we start implmenting more complex instructions and compling and running larges pieces of code, we'll end up with a lot of values crammed into that array. it would make our lives as vm hackers easier if we had some visibility into the stack.
+
+to that end, whenever we're tracing execution, we'll also show the current contents of the stack before we interpret each instruction
+
+we loop, printing each value in the array starting at the first (bottom of the stack) and ending up when we reach the top. this lets us observe the effect of each instruciton on the stack. the output is pretty verbose, but it's useful when we're surgically extracting a nasty bug from the bowels of our interpreter
+
+Stack in hand, let's revisit our two instructions. first up:
+
+The heart and soul of our VM are in place now. The bytecode loop dispatches and executes instructions. The stack grows and shrinks as values flow through it. The two halves work, but it's hard to get a feel for how cleverly they interact with only the two rudimentary instructions we have so far. So let's teach our interpreter to do arithmetic.
+
+We'll start with the simplest arithmetic operation, unary ngation.
+
+The prefix - operator takes one operand, the value to negate. it produces a single result.
+
+We aren't fussing with a parser yet, but we can add the bytecode instruction that the above syntax will compile to.
+
+What goes into adding a new instruction now? 
+- Add it to the interpreter's run function
+- Add it to the dissasemble instruction command
+
+Okay so unary operators aren't so interesting,
+
+what is intesting is binary operators
+
+Lox has four binary arithmetic operators: addition, subtraction, multiplication, and division
+
+the binary op macro has a do while wrapper - it's used to encapuslate the whole body definition in case it's used inline in a way that doesn't really work
