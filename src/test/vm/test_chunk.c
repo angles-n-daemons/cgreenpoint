@@ -34,7 +34,7 @@ void testConstant16() {
 	initChunk(&chunk);
 
 
-	for(int i=0; i < 100; i++) {
+	for(int i=0; i < 256; i++) {
 		Value value = (double)i;
 		writeConstant(&chunk, value, i);
 	}
