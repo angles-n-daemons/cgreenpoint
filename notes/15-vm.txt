@@ -89,3 +89,38 @@ what is intesting is binary operators
 Lox has four binary arithmetic operators: addition, subtraction, multiplication, and division
 
 the binary op macro has a do while wrapper - it's used to encapuslate the whole body definition in case it's used inline in a way that doesn't really work
+
+
+challenge 15.2
+if you don't have negate, you have to subtract numbers from 0 to achieve what you want
+
+if you don't have subtract, you have to negate and add to subtract
+
+Not the worst, just kinda confusing
+
+I like having both instructions, but perhaps there's some reason to limiting the instructionset
+
+Challenge 15.3
+
+If our vm has a fixed stack size, we don't check if anything overflows it
+
+A wrong set of instructions can cause our interpreter to crash or go into undefined behavior.
+
+If we avoid that by dynamically growing the stack what are the trade offs?
+
+pros:
+ - stack can grow (almost) infinitely
+ - programmers don't have to worry about it as much
+
+cons:
+ - we need to keep track of the stack size as it grows
+ - perhaps a small performance hit for allowing a large stack?
+ - more complicated code
+
+Challenge 15.4
+
+To interpret OP_NEGATE, we pop the operand, negate the value and then push the result. That's a simple implementation, but it incremenets and decrements stackTop unnecessarily since the stack ends up the same height at the end. Might be worth while trying to do it in place. Any benefit?
+
+Are there other operations where we can do a similar optimization?
+
+yes, it's about twice as fast to do it in place. we could add a similar optimization for a lot of things, we wouldn't have to pop twice for all binary operators
