@@ -129,6 +129,29 @@ void testVMMultiply() {
 	freeVM();
 }
 
+
+void testVMComplex() {
+	printf("test_vm: testing complex expression\n");
+	initVM();
+
+	Chunk chunk;
+	initChunk(&chunk);
+	
+	writeConstant(&chunk, 1.2, 2);
+	writeConstant(&chunk, 3.4, 2);
+	writeChunk(&chunk, OP_ADD, 2);
+	writeConstant(&chunk, 5.6, 2);
+	writeChunk(&chunk, OP_DIVIDE, 4);
+	writeChunk(&chunk, OP_NEGATE, 4);
+	writeChunk(&chunk, OP_RETURN, 4);
+
+	interpret(&chunk);
+
+	// teardown
+	freeChunk(&chunk);
+	freeVM();
+}
+
 void testVM() {
 	testVMBasic();
 	testVMConstant16();
@@ -137,5 +160,6 @@ void testVM() {
 	testVMSubtract();
 	testVMDivide();
 	testVMMultiply();
+	testVMComplex();
 	printf("testVM ran successfully\n");
 }
