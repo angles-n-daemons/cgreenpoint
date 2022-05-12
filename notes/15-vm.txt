@@ -124,3 +124,47 @@ To interpret OP_NEGATE, we pop the operand, negate the value and then push the r
 Are there other operations where we can do a similar optimization?
 
 yes, it's about twice as fast to do it in place. we could add a similar optimization for a lot of things, we wouldn't have to pop twice for all binary operators
+
+
+DESIGN NOTE
+
+Register based byte code
+
+For the remainder of this book, we'll meticulously implement an interpreter around a stack based bytecode instruction set. There's another family of bytecode architectures out there, register based. despite the name, these bytecode instructions aren't quite as difficult to work with as registers in an actual chip like x64. with real hardware registers, you only get a couple for each program - so you spend a lot of effort trying to efficiently shuffle data in and out of them.
+
+In a register-based vm, you still have a stack. Temp values get pushed onto it and popped when no longer needed. The main difference is that instructions can read their inputs from anywhere in the stack and can store their outputs into specific stack slots
+
+Take this greenpoint script
+
+var a = 1
+var b = 2
+var c = a + b
+
+In our stack based vm, the last statement will get compiled to something like
+
+load <a> // read local a and push onto stack
+load <b> // read local b and push onto stack
+add
+store <c> // store result of add in local variable c
+
+
+it's okay if you don't understand load / store - we'll go into them in more detail when we implement variables
+
+we have four separate instructions. that means four times through the bytecode loop, four instructios to decode and dispatch. This is also at least seven bytes, 
+
+In a register based instruction set, instructions can read from and store directly onto local variables
+
+add <a> <b> <c> // read from a and b, store in c
+
+The add instruction is bigger, it has three instruction operands that define where in the stack it reads its inputs from and write the result to. since local variables live on the stack, it can read directly fr a and b and then store the result in c
+
+There's only a single instruction to decode and dispatch, and the whole thing fits in four bytes. decoding is more complex because of the additional operands, but its still a net win. there's also no pushing and popping onto the stack so that's nice
+
+The main implementation of Lua used to be stack based. For Lua 5.0 the implementers switched to a register instruction set and noted a speed improvement.
+
+The amount of improvement, naturally depends heavily on the language semantics, instruction set, compiler sophistication, but that should get your attention
+
+This might raise the question as to why the rest of the book is a stack based instruction set. register vms are neat, but they're harder to write a compiler for. For what's going to be your first compiler, we wnat to stick to an instruction set that's easy to generate and easy to execute. stack based bytecode is marvelously simple
+
+
+it's also much better known in the literature and community. Even though you may eventually move to something more advanceed, it's a good common ground to share with the rest of your peers

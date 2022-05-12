@@ -332,14 +332,14 @@ void testChallenges() {
 }
 
 void testVM() {
-	//testVMBasic();
-	//testVMConstant16();
-	//testVMNegate();
-	//testVMAdd();
-	//testVMSubtract();
-	//testVMDivide();
-	//testVMMultiply();
-	//testVMComplex();
+	testVMBasic();
+	testVMConstant16();
+	testVMNegate();
+	testVMAdd();
+	testVMSubtract();
+	testVMDivide();
+	testVMMultiply();
+	testVMComplex();
 	testChallenges();
 	printf("testVM ran successfully\n");
 }
