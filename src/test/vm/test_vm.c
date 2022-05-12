@@ -130,9 +130,9 @@ void testVMMultiply() {
 }
 
 void testVM() {
-	//testVMBasic();
-	//testVMConstant16();
-	//testVMNegate();
+	testVMBasic();
+	testVMConstant16();
+	testVMNegate();
 	testVMAdd();
 	testVMSubtract();
 	testVMDivide();
