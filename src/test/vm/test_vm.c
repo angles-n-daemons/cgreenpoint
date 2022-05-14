@@ -1,10 +1,11 @@
-#include "test_vm.h"
-#include "../../vm/chunk.h"
-#include "../../vm/vm.h"
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <time.h>
+
+#include "test_vm.h"
+#include "../../vm/chunk.h"
+#include "../../vm/vm.h"
 
 void testVMBasic() {
 	// setup
@@ -14,7 +15,7 @@ void testVMBasic() {
 
 	writeConstant(&chunk, 1.2, 1);
 	writeChunk(&chunk, OP_RETURN, 3);
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -33,7 +34,7 @@ void testVMConstant16() {
 	}
 
 	writeChunk(&chunk, OP_RETURN, 300);
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -50,7 +51,7 @@ void testVMNegate() {
 	writeChunk(&chunk, OP_NEGATE, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -69,7 +70,7 @@ void testVMAdd() {
 	writeChunk(&chunk, OP_ADD, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -88,7 +89,7 @@ void testVMSubtract() {
 	writeChunk(&chunk, OP_SUBTRACT, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -107,7 +108,7 @@ void testVMDivide() {
 	writeChunk(&chunk, OP_DIVIDE, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -126,7 +127,7 @@ void testVMMultiply() {
 	writeChunk(&chunk, OP_MULTIPLY, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -149,7 +150,7 @@ void testVMComplex() {
 	writeChunk(&chunk, OP_NEGATE, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -170,7 +171,7 @@ void testChallenge1_1() {
 	writeChunk(&chunk, OP_ADD, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -191,7 +192,7 @@ void testChallenge1_2() {
 	writeChunk(&chunk, OP_ADD, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -212,7 +213,7 @@ void testChallenge1_3() {
 	writeChunk(&chunk, OP_SUBTRACT, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -238,7 +239,7 @@ void testChallenge1_4() {
 	writeChunk(&chunk, OP_SUBTRACT, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -261,7 +262,7 @@ void testChallenge2_1() {
 	writeChunk(&chunk, OP_SUBTRACT, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -284,7 +285,7 @@ void testChallenge2_2() {
 	writeChunk(&chunk, OP_ADD, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
-	interpret(&chunk);
+	interpretChunk(&chunk);
 
 	// teardown
 	freeChunk(&chunk);
@@ -311,7 +312,7 @@ void testChallenge4() {
 	writeChunk(&chunk, OP_RETURN, 4);
 
   clock_gettime(CLOCK_MONOTONIC, &start);
-	interpret(&chunk);
+	interpretChunk(&chunk);
   clock_gettime(CLOCK_MONOTONIC, &end);
 	uint64_t timeElapsed = timespecDiff(&end, &start);
 	printf("%" PRIu64 "\n", timeElapsed);

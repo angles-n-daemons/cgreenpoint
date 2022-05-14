@@ -1,0 +1,97 @@
+the scanner goes through the user's source code and tracks how far it's gone
+
+like we did in the vm, we wrap that state in a struct and then create a single top level module variable of that type so we don't have to pass it around to all of the functions
+
+there are surprisingly few fiels
+
+the start pointer marks the beginning of the current lexeme being scanned, and current points to the current character being looked at
+
+start and end represent the start and end of the current token
+
+we have a line for the current token for error reporting. that's it!
+
+we don't even need to keep a pointer to the beginning of the source string
+
+the scanner works its way through the source code and is done after that
+
+since we have some state, we should initialize it
+
+in greenpoint, the scanner scanned all the tokens at once - this iis a problem in cgreenpoint. we'd need some growable array to store the tokens in. that's a lot of code and a lot of memory churn
+
+at any point in time, the compiler only needs one or two tokens.
+
+our grammar requires only a single token of lookahead - we dont need to keep them all around at the same time
+
+at any point in time, the compiler only neds one or two tokens. remember our grammar requires only a single token of lookahead so we don't need them all at the same time
+
+the simplest solution is not to scan a token until we need one
+
+when the scanner provides one, it returns the token by value
+
+it doesn't dynamically alloc anything - it just passes tokens around on the stack
+
+Unfortuantely we don't have a compiler that can ask for tokens, so the scanner will do nothing. to address this we'll write some code to scan the tokens
+
+printing %.*s is a neat format string feature. usually you set the output precision, the numer of characters to show by placing a number inside the format string. Using * let's you pass the precision as an argument. So that printf prints the token.length characters of the string at token.start
+
+We need to limit that length because the token points to the original ource string - and doesn't have a terminator end
+
+This loops indefinitely. Each turn through the loop, it scans one token and prints it When it reaches an end of file token or an errore, it stops. For example, if we run the interpreter on this program
+
+print 1 + 2;
+
+It prints out
+1 31 'print'
+| 21 '1'
+| 7 '+'
+| 21 '2'
+| 8 ';'
+2 39 ''
+
+
+The first column is the line number, the secont is the token type as a number, the last is the lexeme
+
+The goal for the rest of the chapter is to make that blob of code work by implementing this key function
+
+Token scanToken();
+
+We prefix everything with a TOKEN because C lets it go to the header's namespace
+
+What's about the TOKEN_ERROR?
+
+There are a couple of errors that get detected during scanning: unterminated strings and unrecognized charcters. In greenpoint, the scanner reports those itself. In cgreenpoint, the scanner produces a synthetic error token for that error and passes it to the compiler. This way the compiler knows an error occured and can kick off error recovery before reporting it
+
+The novel part of cgreenpoints token type is how it represents the token. In greenpoint, each token stored the lexeme as its own java string. in cgreenpoint if we wanted to do that, we'd have to keep track of memory for each token. That would be hard because we pass tokens by value. Multiple tokens could point to the same lexeme string. Ownership gets weird
+
+Instead we use the original source string as our character store.
+
+We represent a lexeme by a pointer to its first character and the number of characters it contains. This means we don't need to worry about managing memory for lexemes at all and we can freely copy tokens around.
+
+As long as the main source code string outlives all of the tokens, everythign works fine
+
+Scanning tokens. We'll work our way up to the complete implementation
+
+Since each call to this function scans a complete token, we know we're at the beginning of a token when we enter the function. Thus we set scanner.start to point to the current character so we remember where the lexeme we're about to scan starts.
+
+Then we check to see if we're reached the end of the source code. If so, we return an EOF token and stop. This is a sentinel value that signals the compiler to stop asking for more tokens.
+
+If we aren't at the end, we do some stuff. to scan the next token. But we haven't written that code yet. We'll get to that soon. If the code doesn't successfully scan and return a token then we reach the end of the function. That must mean we're at a character that the scanner can't recognize, so we return an error token for that.
+
+This function relies on a couple helpers that we remember from greenpoint
+
+With the errorToken function, the only difference is that the lexeme points to an error message. In practice we only call this function with C string literals. Those are constant and eternal so we're fine
+
+What we have now is a working scanner for a language with an empty lexical grammar. Since the grammar has no productions, every character is an error. That's not a fun language to program in, so let's fill in the rules.
+
+similar to greenpoint, we consume characters until we reach the closign quote. we also track newlines inside the string literal
+
+The main change here in cgreenpoint is something that's not present. It also pertains to memory management
+
+In greenpoint, the token class had a field of type object to store the runtime value converted from the literal token's lexeme.
+
+Implementing this in C would be a lot of work. We'd need some sort of union and type tag to tell whether the token has a string or double. If it's a string, we'd need to manage the memory for the string's value.
+
+Instead of adding that complexity to the scanner, we defer converting the literal to a runtime value until later. in cgreenpoint tokens only store the lexeme - the character sequence exactly as it appears in the user's source
+
+Later in the compiler, we'll convert that lexeme to a runtime value when we're about to store it into the chunk's constant table
+
