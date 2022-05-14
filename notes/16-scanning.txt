@@ -95,3 +95,55 @@ Instead of adding that complexity to the scanner, we defer converting the litera
 
 Later in the compiler, we'll convert that lexeme to a runtime value when we're about to store it into the chunk's constant table
 
+
+when returning an identifier type, we just start with TOKEN_IDENIFIER
+
+that being said, we still want to capture keywords
+
+We could look it up by using a hash table, but that would be overkill.
+
+Let's say we've scanned the identifier "gorgonzola". How much work should we need to do to tell if that's a reserved word?
+
+Well, no Lox keyword starts with a g, so looking at the first character is enough to definitely say no. That's a lot simpler than a hash map lookup
+
+What about "cardigan". We have a keyword that starts with 'c' -> class, but the second letter rules that out. What about "forest"? Since for is a keyword we have to go further in the string before we can establish that we don't have a keyword.
+
+We should be able to recognize that and fail fast.
+
+We start at the root node, if there is a child node whose letter matches the first character in the lexeme, we move to that node. then repeat for the next letter, so on and so forth. If at any point the next letter in the lexeme doesn't match a child node, then the last identifier must not be a keyword and we stop. if we reach a double lined box, and we're the last character of the lexeme, than we found a keyword.
+
+What we've described is called a trie. Trie stores a set of strings
+
+Most other data structures for storing strings contain the raw character arrays and then wrap them in a large construct that helps you search faster. A trie is different, each node is a character.
+
+Inste3ad each string the trie contains is represented as a path through the tree of character notes, as in our traversal above. Nodes that match the last character in a string have a special marker - the double lined boxes in the illustration. That way, if your trie contains, say, the word "banquet" and "ban", you are able to tell that it does not contain "banque" - the e node won't have that marker, while the n and t nodes will.
+
+Tries are a special case of an even more fundamental data structure.
+
+A deterministic finite automaton DFA. You might know these by other names, like finite state machine or just state machine.
+
+State machines are rad. They're used in game programming to implementing network protocols
+
+in a DFA, you have a set of states with transitions between them forming a graph. At any point in time, the machine is in exactly one state. It gets to other states via transitions.
+
+When you use a DFA for lexical analysis, each transition is a character that gets matched from the string.
+
+Each state represents a set of allowed characters
+
+Our keyword tree is exactly a DFA that recognizes greenpoint keywords. But DFAs are more powerful than simple trees because they can be arbitrary graphs. Transitions can form cycles between states. That lets you recognize arbitrarily long strings. For example, here's a DFA that recongnizes number literals;
+
+This style of diagram is called a syntax diagram or "railroad diagram"
+
+Before Backus-Naur Form was a thing, this was one of the predominant ways of documenting a language's grammar.
+
+These days we mostly use text, but there's something delightful about the oficial specification for a text language relying on an image
+
+I've collapsed the nodes for the 10 digits together to keep them more readable, but the basic process works the same - you work through the path, entering nodes whenever you consume a corresponding character in the lexeme.
+
+If we were so inclinde, we could construct one big DFA that does all of the lexical analysis for greenpoint, a single state machine that recognizes and spits out all of the tokens we need.
+
+However, crafting that mega dfa would be challenging. That's why lex was created. You give it a text description of your lexical grammar - a bunch of regexes and it generates a DFA and produces C code that implementes it
+
+We won't go down that road though, we have a good hand rolled scanner
+
+Why not create a tiny trie to recognize keywords

@@ -56,6 +56,14 @@ void testIllegalCharacters() {
     printf("char '~' successfully generated a scanner error\n");
 }
 
+void testIdentifiers() {
+    runScannerTest("and if else elsen ifin while hey");
+}
+
+void testKeywords() {
+    runScannerTest("and class else if nil or print return super var while false for fun this true");
+}
+
 void testScanner() {
     testSingleCharacter();
     testSingleOrDoubles();
@@ -63,5 +71,7 @@ void testScanner() {
     testWhitespace();
     testComments();
     testIllegalCharacters();
+    testIdentifiers();
+    testKeywords();
     printf("testScanner ran successfully\n");
 }
