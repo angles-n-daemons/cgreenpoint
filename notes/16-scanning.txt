@@ -147,3 +147,38 @@ However, crafting that mega dfa would be challenging. That's why lex was created
 We won't go down that road though, we have a good hand rolled scanner
 
 Why not create a tiny trie to recognize keywords
+
+Many new langauges have string interpolation
+
+Inside of a string literal, you have special delimiters (commonly ${ at the beginning and } at the end
+
+Between those expressions, any expression can appear
+
+For example. if lox supported string interpolation than this-
+
+var drink = "Tea"
+var steep = 4
+var cool = 2
+print "${drink} will be ready in ${steep + cool} minutes.";
+
+What does this print?
+
+What token types do I need to implement for string interpolation
+
+What sequence of tokens would I emit for the above string literal?
+
+I think I need the expression tokens again
+
+I think I would also need to keep track of whether string interpolation has started
+
+This means adding additional state to the scanner
+
+There's no nesting functionality for it right now
+
+I suppose that means if I hit a '}' character, it means I go back into string parsing
+
+I think for the angle bracket stuff, we can also keep a count of open generics and use the closing angle brackets to determine whether we're looking at generics or bishift?
+
+Oh or one could always scan the chars as single characters then let the parser handle determining whether it's a bitshift operator or not
+
+

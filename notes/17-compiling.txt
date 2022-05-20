@@ -1,0 +1,296 @@
+this chapter is exciting for 3 reasons.
+
+First it provides the final implementation for our VM execution pipeline. Once in place, we can plumb the user's source codee from scanning all the way through to executing it
+
+second, we get to write an honest to god compiler
+
+it parses source code and outputs a low level series of binary instructions.
+
+okie, this is bytecode and not a native chip instruction set, but it's closer to the metal than greenpoint was.
+
+this is real language development
+
+third, we get to see some of our fav algorithms
+
+Vaughan Pratt's top down operator precedence parsing - it's the most elegant way the author knows how to parse expressions
+
+It gracefully handles prefix operators, postfix, infix, mixfix, any type of fix.
+
+It deals with precedence and associativity without breaking a sweat
+
+
+Prattt parsers are sort of an oral tradition in industry. No compiler or lanugage book seems to teach them. Academia is focused on generated parsers, and Pratt's technique is for hand written ones so it often gets overlooked
+
+In production compilers which are hand-rolled, you'd be surprised how many people know it. Ask where they learned and they always say they worked on a compiler years ago and thier coworker took it from another one's front end
+
+As ususal, before we get to the fun stuff - we've got some prelims to work through. You have to eat your vegetables before you get to dessert. First let's ditch the temp scaffolding we wrote for testing the scanner and replace it with something more useful
+
+
+Now we create an empty chunk and pass it and the source to the compiler
+
+then we free the chunk if it returns a compilation error, otherwise we run it and return the result
+
+The call to advance "primes the pump" on the scanner. We'll see what it does soon. They we parse a single expression. We aren't going to do statements so that that's the only subset of the grammar we support
+
+We'll revisit this when we add statements in a few chapters
+
+After we compile the expression, we should be at the end of the source code, so we check for the EOF token to verify
+
+We're going to spend the rest of the chapter making this func work, especially the expression call.
+
+Normally we'd dive right into that funtion definitiona nd work through the implmementation from top to bottom
+
+This chapter is different. Pratt's parsing technique is really simple once you have it all loaded in your head, but its tricky to break into bite sized pieces. It's recursive which is part of the problem, but it also relies on a big table of data. As we build up the algorithm, that table grows additional columns
+
+Single pass compilation
+
+A compiler has two jobs:
+1. Parse user's source code and understands what it means
+2. Takes that understanding and outputs low level instructions that produce the same semantics
+
+Many languages split those two roles into separate passes in the implementation. A parser produces an AST, and then a code generator walks that AST and produces target code.
+
+Believe it or not, a lot of sophisticated optimizing compilers have a lot more than just two passes. Determinining not just what optimization passes to have, but how to order them to squeeze the most performance out of the compiler - since the optimizations often act in complex ways - is somewhere between an "open area of research" and a "dark art"
+
+In cgreenpoint, we're taking an old-school approach and merging these two passes into one.
+
+Back in the day, language hackers did this because computers literally didn't have enough memory to store an entire AST. We're doing it because it makes the compiler simpler which is an asset in C.
+
+Single pass compilers like we're going to build don't work well for all langs. Since the compiler has only a peephole view into the user's program when generating code, the language must be designed such that you don't need much surrounding context to understand a piece of syntax
+
+Fortunately, tiny, dynamically typed greenpoint is well suited to do that
+
+What this means is in practical terms is that our "compiler" C module has functionality you'll recognize from greenpoint parsing - consuming tokens, matching expected token types, etc
+
+And it also has functions for code gen - emittting bytecode and adding constants to the destination chunk.
+
+We'll build the parsing and code generation halves first
+
+what this means is that our compiler has the functionality from greenpoint for parsing - consuming tokens, matching expected types etc and it has functions for codegen - emitting bytecode and adding constants to the destination chunk
+
+WE'll build the parsing and codegen halves first, then we'll stitch them together with the code in the middle that uses Pratt's technique to parse greenpointss grammar and output the right bytecode
+
+Parsing tokens
+
+First up, the front half of the compiler. this function should sound familiar
+
+so we create an advance function which moves the cursor forward, stores the previous token and consumes tokens as long as there's errors until there's a non-error token.
+
+Then we create an error reporting fucntion which takes a token and a message, and dumps a message including the token line, token content, and the message for the user.
+
+This error reporting function also sets a property on the parser so that it knows it had an error
+
+We want to avoid error cascades, if the user has a mistake in their code and the arser gets confused about where it is in the gramar, we don't want to spew out knock on errors after the first one
+
+We fixed that in greenpoint using panic mode error recover. In the java interpreter, we threw out an exception to unwind out of all the parser code to a point where we could skip tokens and resynchronize. We don't have exceptions in C. Instead we'll do a little smoke and mirrors. WE add a flag to track whether we're currently in panic mode
+
+there is a setjmp and longjmp but we'd rather not go there. Those ,ake it too easy to leak memory, maintain invariant
+
+after that we go ahead compiling as if the error never occured. The bytecode will never get executed, so it's harmless to keep on trucking. The trick is that when panic mode is set, we simply supress other errors that get detected
+
+There's a good chance the parser will go off in the weeds, but the user won't know because the errors all get swallowed. Panic mode ends when the parser reaches a synchronization point. For greenpoint we choose statement boundaries, so when we add those to our compiler, we'll clear the flag there.
+
+The new fields need to be initialized
+
+It's similar to advance in that it reads the next token, but it also validates that the next token has an expected type. Okay that's enough on the front end for now.
+
+After we parse and understand a piece of the user's program, the next step is to translate that to a series of bytecode instructions. It starts with the easiest possible step: appending a single byte to the chunk
+
+this is enough for the front end now
+
+# Emitting bytecode
+
+Once we've parsed a piece of the user's program, the next step is turning that meaning into a sequence of instructions. The easiest part of this is appending a byte to the chunk
+
+What this simple thing does is the foundation for how the entire codebase is generated. It takes could write an instruction or an operand to the chunk. It uses the last token's line to draw an association for the byte
+
+The chunk that we're writing gets passed into compile, but needs to make its way to emitByte. To do that, we rely on this intermediary funtion
+
+Right now the chunk pointer is stored in a module level variable like we store other global state.
+
+Later when we start compiling user-defined functions, the notion of current chunk gets more compilicated. To avoid having to go back and change a lot of code, I encapsulate that logic in the currentChunk() function
+
+We initialize this new module variable before we write any bytecode
+
+Then at the very end when we're done compiling the chunk we wrap things up
+
+While we're in the back here we may as well make our lives easier
+
+Over time, we'll have enough cases where we need to write an opcode followed by a one byte operand that it's worth defining this convenience function
+
+# parsing prefix expressions
+
+We've assembled our parsing and code generation utility functions. The missing piece is the code in the middle that connects the two together.
+
+The only step in compile we have left to implement is this function
+
+expression
+
+we aren't ready to implement every kind of expression yet. Heck we don't even have booleans. For this chapter, we're only going to worry about four:
+
+Number literals: 123
+Parentheses for grouping: (123)
+Unary negation: -123
+The four horsemen of arithmetic: +, -, *, /
+
+As we work through the functions to compile each kind of these expressions, we'll also assemble the requirements for the table driven parser that calls them.
+
+parsers for tokens
+
+for now, let's focus on the lox expressions that are each only a single token. in this chapter, that's just number literals, but there will be more later.
+
+Here's how we can compile them
+
+we map each token type to a different kind of expression. we define a function for each expression that outputs the appropriate bytecode. then we build an array of function po0inters. the indexes in the array correspond to the token type enum values and the function at each index is the code to compile an expression of that token type
+
+we map each token type to a type of expression. We define a function for each expression that outputs the appropriate bytecode. Then we build an array of function pointers. the indexes in the array correspond to the tokentype enum values, and the function at each index is the code to compile an expression of that token type
+
+To compile literals, we store a pointer to the following function at the token number index in the array
+
+We assume the token for the number literal has already been consumed and is stored in previous. We take that lexeme and use the C standard library to convert it to a double value. Then we generate the code to load that value using emitConstant, which calls emitBytes with the constant opcode and the makeConstant function
+
+Most of the work happens in addConstant, which we defined in a previous chapter. That adds the given value to the end of the chunks constant table and returns its index. The new function's job is mostly to make sure we don't have too many constants. Since the OP_CONSTANT instruction uses a single byte for the index operand, we can store and load up to 256 constants in a single chunk.
+
+Parens for grouping
+
+Our as-yet-imaginary array of parsing function pointers would be great if every expression were a single token long. However, most are longer. However many expressions start with a particular token. We call these prefix operations. For example, when we're parsing an expression and the current token is (, we know we must be looking at a parenthesized grouping expression.
+
+Turns out our function pointer array handles those too. The parsing function for an expression type can consume any additional tokens that it neeeds to, just like in a recursive descent parser. Here's how parentheses work:
+
+Again we assume the initial '(' has already been consumed. We recursvely call back into expression() to compile the expression between the parenthese, then close the ) at the end.
+
+A pratt parser isn't a recursive descent parser, but it's still recursive. That's to be expected since the grammar itself is recursive.
+
+As far as the back end is concerned, there's literally nothing to a grouping expression. It's sole function is syntactic. It lets you insert a lower precedence expression where a higher precedence one is expected. Thus it has no runtime semantics on its own and therefore doesn't emit any bytecode.
+
+The inner call to expression() takes care of generating bytecode for the expression inside the parens
+
+Unary negation
+
+The leading - token has been consumed and is sitting in parser.previous. We grab the token type from that to note which unary operator we're dealing with. It's unnecessary right now, but this will make more sense when we use this same function to compile the ! operator in the next chapter.
+
+As in grouping() we recursively call expression to compile the operand. After that we emit the bytecode to perform the negation. It might seem a little weird to negate the instruction after its operands bytecode, since the - appears of it in order of execution
+
+1. We evaluate the operand first which leaves its value on the stack
+2. We pop that value, negate it, and push the result.
+
+So the OP_NEGATE instruction should be emitted last. This is part of the compiler's job - parsing the program in the order it appears in the source code and rearranging it into the order that execution happens.
+
+There's one problem with this approach, it doesn't take into account operator precedence. Once we add binary operators and other syntax, it'll do the wrong thing:
+
+Consider:
+
+-a.b + c
+
+Here the operand to - should be just the a.b expression, not the entire a.b + c. But if unary calls expression(), the latter will happily chew through the remaining code including the +. It will erroneously treat the - as lower precedence than the +
+
+When aprsing the operand to unary -, we need to compile only expressions at a certain precedence level or higher.
+
+In greenpoint's recursive descent parser, we accomplished that by calling into the parsing method for the lowest-precedence expression we wanted to allow (in this case, call()). Each method for parsing a specific expression also parsed any expressions of higher prescedence too, so that included the rest of the precedence table
+
+The parsing functions like number and unary here in clox are different. Each only parses exactly one type of expression. They don't cascade to include higher precedence expression types too. We need a diffewrent solution and it looks like this:
+
+parsePrecedence
+
+
+This function starts at the current token and parses any expression at the given precedence level or higher. We have some other setup to get through before we can write the body of this function, but you can probably guess that it will use that table of parsing function pointers I've been talking about. For now, don't worry too much about how it works. In order to take the precedence as a parameter, we'll define it numerically
+
+If we call parsePrecedence(PRE_ASSIGNMENT) then it will parse the entire expression because + has a higher precedence than assignment. If we instead call parsePrecedence(PREC_UNARY) it will compile the -a.b and stop there. It doesn't keep going through the + because the addition has lower precedence than unary operators.
+
+With this function in hand, it's a snap to fill in the missing body for expression
+
+parse the lowest precedence level, which subsumes all of the higher precedence expressions too. Now to compile the operand for a unary expression we call it at the appropriate level
+
+We use the unary operator's own prec_unary precedence to permit nested unary expressions like !!doubleNegative
+
+Since unary operators have pretty high precedence, that excludes things like binary operatores
+
+Speaking of which
+
+Binary operators are different than previous operations because they are infix. With other expressions, we don't know w're in the middle of a binary operator until after we've parsed its left operand and then stumbled onto the token operator in the middle
+
+Here's an example:
+
+1 + 2
+
+Let's walk through trying to compile it with what we know so far:
+
+We call expression(). That in turn calls parsePrecedence(PREC_ASSIGNMENT)
+
+the function sees the leading number and recognizes it as a number literal. It hands off control to number()
+
+number() creates a constant, emits an OP_CONSTANT and returns back to parsePrecedence
+
+
+Now what? The call to parsePrecedence should consume the entire addition expression, so it needs to keep going somehow. Fortunately the parser is right where it needs to be. Now that we've compiled the leading number expression, the next token is +. That's the exact token that parsePrecedence needs to detect that we're in the middle of an infix expression and to realize that the expresion we already compiled is actually an operand to that
+
+So this hypothetical array of function pointers doesn't just list functions to parse expressions that start with a given token. Instead it's a table of function pointers.
+
+One column associates prefix parser functions with token types. The second associates infix parser functions with token types
+
+The function we'll use as the infix parser for TOKEN_PLUS, TOKEN_MINUS, TOKEN_STAR and token slash is this:
+
+When a prefix parser function is called, the leading tokeno has already been consumed. An infix parser function is even more in medias res. The entire left hand expression has been compiled and the subsequent infix operator consumed
+
+The fact that the left operand gets compiled works out fine
+
+
+it means that at runtime when the code gets run that code gets executed first, then the right operand is executed and then the operator uses those two values on the stack
+
+we have all the pieces and parts of the compiler laid out. we have a function for each grammar production: number(), grouping(), unary(), and binary()
+
+We still need to implement parsePrecedence and getRul. We know that we need a table that given a token type lets us find
+- the function to compile a prefix expression starting with a token of that type
+- the function to compile an infix operand whose left operand is followed by[ a token of that type
+- the precedence of an infix expression that uses that token as an operator
+
+we wrap these three properties in a little struct which represents a single row in the parser table
+
+You can see how grouping and unary are slotted into the prefix parser column for their respective toke types
+
+in the next column, binary is wired up to the four arithmetic infix operators. Those infix operators also have their precedences set in the last column.
+
+Aside from those, the rest of the table is full of NULL and PREC_NONE. Most of those empty cells are because there is no expression associated with those tokens. You can't start an expression with else and } would make for a pretty confusing infix operator
+
+
+We haven't filled in the entire grammar yet though. In the later chapters, as we add new expression types, some of these slots will get functions in them. One of the thigns I like about this approach to parsing is that it makes it very eeasy to see which tokens are in use by the grammar and which are available.
+
+
+we read the next token and look up the parse rule. if there is no prefix parser, then the token must be a syntax error. We report that and return back to the caller
+
+Otherwise we let that prefix parse do its thing. The prefix parser compiles the rest of the prefix expression, caonsuing any other tokens it needs and returns bacvk here. infix expressions are where it gets interesting since precedence comes into play. The implemntation is remarkably simple
+
+
+That's the whole thing, here's how the entire function works - at the beginning of parsePrecedence we look up a prefix parser for the current token. The first token is always going to belong to some kind of prefix expression.
+
+After parsing that, which may consume more tokens, the prefix expression is done. Now we look for an infix parser for the next token. If we find one, it means the prefix expression we already compiled might be an operand for it
+
+Otherwise we consume the operator and hand off control to the infix parser we found.
+
+It consumes whatever other tokens it needs (usually the right operand) and returns back to parsePrecedence. Then we loop back around to see if the next token is also a valid infix operator that can take the entire preceding expression as its operand. We keep looping like that, crunching through infix operators and their operands until we hit a token that isn't an infix operator or is too low precedence and stop
+
+That's a lot of prose, but if you really want to mind meld with Vaughan Pratt and fully understand the algorithm, step through the parser in your debugger as it works through some expressions. Maybe a picture will help.
+
+I worry about a lot of my friends being depressed. I don't think they all are. I think I need out of NYC. Shit is really in my head right now and I need a little space.
+
+I need to hang out with my friends a little less. It's causing me a little anxiety, and I'm going to need some time to recover from it.
+
+why can parseprecedence expect a prefix rule?
+
+It's only called after we pass an operator.
+
+Oh wait yes that's right.
+
+It calls advance first so you can pretty much guarantee you pass an operator.
+
+So if I call parsePrecedence on:
+
+!(4+3)+5
+
+hmmm.that's not true I suppose
+
+while we're here in the core of our compiler, we should put in some instrumentation. To help debug the generated bytecode, we'll add support for dumping the chunk once the compiler finishes. We had some temporary logging earlier when we hand-authored the chunk. Now we'll put in some real code so that we can enable it whenever we want.
+
+Since this isn't for end users, we hide it behind a flag
+
+If we did this right we should have a simple interpreter that does arithmetic
