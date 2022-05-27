@@ -8,6 +8,7 @@
 #include "test/vm/test_chunk.h"
 #include "test/vm/test_vm.h"
 #include "test/compiler/test_scanner.h"
+#include "test/compiler/test_compiler.h"
 
 static void repl() {
 	char line[1024];
@@ -21,7 +22,7 @@ static void repl() {
 			break;
 		}
 
-		//interpret(line);
+		interpret(line);
 	}
 }
 
@@ -81,6 +82,7 @@ void test() {
 	testChunk();
 	testVM();
 	testScanner();
+	testCompiler();
 	printf("all tests pass\n");
 }
 

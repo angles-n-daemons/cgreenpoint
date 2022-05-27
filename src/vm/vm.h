@@ -12,7 +12,6 @@ typedef struct {
     Value stack[STACK_MAX];
     Value* stackTop;
     int line_offset;
-    int line_count;
 } VM;
 
 typedef enum {

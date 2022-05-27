@@ -294,3 +294,45 @@ while we're here in the core of our compiler, we should put in some instrumentat
 Since this isn't for end users, we hide it behind a flag
 
 If we did this right we should have a simple interpreter that does arithmetic
+
+
+# On debugging a segmentation fault in the interpreter:
+
+in debugging this, I created a helper function called q for printing text to /tmp/q
+
+Things to note:
+ - The compiler correctly turns the source code into a code block.
+ - When executing the instructions, it first tries to print out the debug information.
+ - When doing the above, it attempts to print the stack which should be empty.
+ - This seems to indicate that vm.stack and vm.stackTop are not equal (which should be the case, because we haven't pushed anything in yet).
+ - What I need to do is check for the following:
+   - See what vm.stack and vm.stackTop are when initialized
+	 - Verify that the above are re-initialized before the compiler test is run
+	 - Check that nothing is pushed between compilation and interpreting
+
+ - I think resetStack isn't being called. I'll check for this before repeating my experiment
+ - I think that initVM isn't being called. Do I need to call it for all my tests?
+ - I'm going to check the book to see where initVM is called in the book source
+
+So it looks like in the book, the only function used for testing is the main function. In that function initVM is called. For my use case I'd like a fresh VM for each test that I run.
+
+What am I going to print, instances of init, push, and pop to see stack manipulation
+
+An idea for a change that I have is that I can call initVM and freeVM in each of the test files
+
+It can also be a setup function.
+
+Note: Writing test suites lets you know how helpful testing frameworks really are.
+
+I just realized that printing these things is going to be marginally helpful during this exercise - but will still give me insight as to the stack being manipulated.
+
+It seems like C is not going to be super fun with this.
+
+Because of safety exploitations in printing, lots of string formatting functions are extremely locked down, not flexible for just printing data
+
+
+/// I think that I've found the issue is in the line offset stuff.
+
+I need to figure out what's going on with the line offset stuff on this chunk (which is written by the compiler)
+
+I feel I need to remove the lines hack. It's been a lot less surgical than I would have hoped and it's starting to get in the way of my understanding of how the things work. I'm going to try to remove it in the next go
