@@ -44,10 +44,12 @@ static InterpretResult run() {
     int line_count = 0;
     for (;;) {
 
+
 #ifdef DEBUG_TRACE_EXECUTION
         // Print the stack
         printf("          ");
         for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
+            printf("[ ");
             printValue(*slot);
             printf(" ]");
         }
@@ -111,7 +113,7 @@ InterpretResult interpret(const char* source) {
         return INTERPRET_COMPILE_ERROR;
     }
 
-    InterpretResult result = run();
+    InterpretResult result = interpretChunk(&chunk);
     freeChunk(&chunk);
     return result;
 }

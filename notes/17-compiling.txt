@@ -338,4 +338,4 @@ I need to figure out what's going on with the line offset stuff on this chunk (w
 I feel I need to remove the lines hack. It's been a lot less surgical than I would have hoped and it's starting to get in the way of my understanding of how the things work. I'm going to try to remove it in the next go
 
 
-So what needs to be changed:
+- the issue was actual rules for interpreting a chunk was being done in the new function interpretChunk, and ignored by interpret
