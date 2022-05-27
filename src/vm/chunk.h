@@ -2,7 +2,6 @@
 #define cgreenpoint_chunk_h
 
 #include "../common.h"
-#include "../line_info.h"
 #include "value.h"
 
 typedef enum {
@@ -20,7 +19,7 @@ typedef struct {
     int count;
     int capacity;
     uint8_t* code;
-    LineInfo lines;
+    int* lines;
     ValueArray constants;
     // TODO: add line info
 } Chunk;

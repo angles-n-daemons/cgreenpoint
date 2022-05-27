@@ -336,3 +336,6 @@ Because of safety exploitations in printing, lots of string formatting functions
 I need to figure out what's going on with the line offset stuff on this chunk (which is written by the compiler)
 
 I feel I need to remove the lines hack. It's been a lot less surgical than I would have hoped and it's starting to get in the way of my understanding of how the things work. I'm going to try to remove it in the next go
+
+
+So what needs to be changed:

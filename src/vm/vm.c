@@ -53,14 +53,8 @@ static InterpretResult run() {
         }
         printf("\n");
 
-        // Dissasemble instruciton and modify the line counts
-        line_count += vm.ip - last_ip;
-        int new_line_offset = getLineOffset(vm.chunk, vm.line_offset, line_count);
-        if (new_line_offset != vm.line_offset) {
-            vm.line_offset = new_line_offset;
-            line_count = 0;
-        }
-        disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code), vm.line_offset);
+        // Disassemble the instruction
+        disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
         last_ip = vm.ip;
 #endif
 
