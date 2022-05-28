@@ -10,16 +10,16 @@ void testConstant() {
 
 
 	for(int i=0; i < 5; i++) {
-		Value value = (double)i;
+		Value value = NUMBER_VAL((double)i);
 		writeConstant(&chunk, value, i);
 	}
 
 	disassembleChunk(&chunk, "hello");
 
 	for(int i=0; i < 5; i++) {
-		Value expected = (double)i;
+		double expected = (double)i;
 		int location = (int)chunk.code[i * 2 + 1];
-		Value value = chunk.constants.values[location];
+		double value = AS_NUMBER(chunk.constants.values[location]);
 		if (value != expected) {
 			printf("failed testConstant: expected %f but got %f\n", expected, value);
 			exit(1);
@@ -35,7 +35,7 @@ void testConstant16() {
 
 
 	for(int i=0; i < 256; i++) {
-		Value value = (double)i;
+		Value value = NUMBER_VAL((double)i);
 		writeConstant(&chunk, value, i);
 	}
 

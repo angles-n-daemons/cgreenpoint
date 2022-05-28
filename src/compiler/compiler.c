@@ -140,7 +140,7 @@ static void emitConstant(Value value) {
 
 static void number() {
     double value = strtod(parser.previous.start, NULL);
-    emitConstant(value);
+    emitConstant(NUMBER_VAL(value));
 }
 
 static void binary() {

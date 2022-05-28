@@ -1,0 +1,90 @@
+Tagged Unions
+
+The nice part about working with C is that you can build your types from the bits up. The bad thing about C is that you have to.
+
+C doesn't give you much at compile time, and even less at runtime. As far as C is concerned, the universe is made up of undetermined bytes. It's up to us to decide what those bytes mean.
+
+In order to choose a value representation, we need to answer two questions:
+
+1. How do we represent the type of a value?
+
+If we try to multiply a number by true, we need to detect that error at runtime and report it. In order to do that, we need to know what a value's type is
+
+2. How do we store the value itself?
+
+We need to not only be able to tell that three is a number, but that it's different from the number four. Seems obvious, but we're operating at a level where it's good to spell these things out.
+
+Since we're not just designing this language but building it ourselves, when answering these two questions we have to keep in mind the implementers eternal quest: to do it efficiently.
+
+Language hackers over the years have come up with a variety of clever ways to pack the above information into the fewest bits possible. We'll start with the simplest implementation, a tagged union.
+
+A value contains two parts: a type "tag", and a payload for an actual value. To store the value's type, we define an enum for each kind of value the vm supports
+
+For now, we only have a couple of cases, but this will grow as we add strings, functions and classes to cgreenpoint. In addition to the type, we also need to store the data for the value - the double for a number, true or fals for a boolean.
+
+We could define a struct with fields for each possible type.
+
+struct
+[..........]
+first 8 bytes are a double, last one is a boolean
+
+But that's a waste of memory. A value can't simultaneously be both a number and boolean. So at any time only one of those fields will be used. C lets you optimize this by defining a union. A union looks like a struct except that its fields overlap in memory
+
+The size of the union is the size of its largest field.
+
+Since the fields all reuse the same bits, you have to be careful when working with them. If you store data using one field and then access it using another, you will reinterpret what the underlying bits mean.
+
+As the name "tagged union" implies, our new value representation combines these two parts into a single struct
+
+note: the payload is called as because it's easy to cast it ie: Value.as (boolean)
+
+There's a field for type tag, and then a second field containing the union of all the underlying values.
+
+On a 64 bit machine, with a typical C compiler, the layout looks like this:
+
+First 4 bytes are the type, second four bytes are padding, the last 8 bytes are whatever the payload is
+
+The four byte type tag comes first, then the union. Most architectures prefer values to be aligned to their size. Since the union field contains an 8 byte double, the compiler adds four bytes of padding after the type field to keep that double on the nearest 8 byte boundary. That means we're effectively spending 8 bytes on the type tag, which only needs to represent a number between zero and 3. We could stuff the enum in a small er size, but that would just increase the padding.
+
+So our Values are 16 bytes which seems a little large. We'll improve on it later.
+
+In the meantime, they're still small enough to store on the C stack and pass around by value. Lox's semantics allow that because the only types we support so far are immutable. If we pass a copy of a value containing the number 3 to some functionm we don't need to worry about the caller seeing modifications to the value. you can't modify three, it's three forever
+
+That's our new value representation, but we aren't done. Right now the rest of cgreenpoint assumes Value is an alias for double. We have code that does a striaght C cast from one to the other. All code is broken now, which sucks.
+
+With our new representation, a value can contain a double, but it's not equivalent to it. There's a mandatory conversion step to get from one to the other. We need to go through the code and insert those conversions to get cgreenpoint working again.
+
+We'll first implement those conversions as a handful of macros, one for each type and operation. First, to promote a native C value to a cgreenpoint value
+
+
+Each one of these helper functions takese a C value of the appropriate type and produces a value that has the correct type tag and underlying value.
+
+This hoists statically typed values up to cgreenpoints dynamically typed universe. In order to do anything with values however, we need to unpack it and get the C value out
+
+These macros go in the opposite direction. Given a Value of the right type, they unwrap it and return the corresponding raw C value. The right type part is important. These macros directly access the union fields. If we were to do something like:
+
+Value value = BOOL_VAL(true);
+double number = AS_NUMBER(value);
+
+Then we may open a smoldering portal to the Shadow Realm. It's not safe to use any of the AS_ macros unless we know the value contains the approrpriate type. To that end, we define a last few macros to check a Value's type.
+
+
+These macros return true if the value has that type.; Anytime we call one of the AS macros we need to guard it behind one of these calls firset. With these eight macros, we can now safely shuttle data betweeen Greenpoint's dynamic world and C's static one.
+
+Dynamically typed numbers
+
+We've got our value representation and the tools to convert to and from it. All that's left is to get cgreenpoint running again is to grind through the code and fix every place where data moves across that boundary. This is one of those sections of the book that isn't mind-blowing, but we promised to see every line of code so here it is.
+
+This has broken a lot I think:
+
+for one, how I do unary and binary arithmatic stuff
+
+second, a lot of my tests:
+
+Things not in the book to fix:
+- Chunk tests
+  - On checking literal value positions, cast to number first
+- Does this work for writing constants?
+  - Ah they cast to a number before passing it in
+  - Write constant was another bonus question. These bonus questions seem to hurt the ability to write stuff in the future. However they do challenge you in moving
+- Modify writeConstant to inspect the type and store it
