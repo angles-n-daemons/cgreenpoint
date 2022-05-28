@@ -13,7 +13,7 @@ void testVMBasic() {
 	Chunk chunk;
 	initChunk(&chunk);
 
-	writeConstant(&chunk, 1.2, 1);
+	writeConstant(&chunk, NUMBER_VAL(1.2), 1);
 	writeChunk(&chunk, OP_RETURN, 3);
 	interpretChunk(&chunk);
 
@@ -29,7 +29,7 @@ void testVMConstant16() {
 	initChunk(&chunk);
 
 	for(int i=0; i < 300; i++) {
-		Value value = (double)i;
+		Value value = NUMBER_VAL((double)i);
 		writeConstant(&chunk, value, i);
 	}
 
@@ -47,7 +47,7 @@ void testVMNegate() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 13.37, 2);
+	writeConstant(&chunk, NUMBER_VAL(13.37), 2);
 	writeChunk(&chunk, OP_NEGATE, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -65,8 +65,8 @@ void testVMAdd() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1.0, 2);
-	writeConstant(&chunk, 2.0, 2);
+	writeConstant(&chunk, NUMBER_VAL(1.0), 2);
+	writeConstant(&chunk, NUMBER_VAL(2.0), 2);
 	writeChunk(&chunk, OP_ADD, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -84,8 +84,8 @@ void testVMSubtract() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1.0, 2);
-	writeConstant(&chunk, 2.0, 2);
+	writeConstant(&chunk, NUMBER_VAL(1.0), 2);
+	writeConstant(&chunk, NUMBER_VAL(2.0), 2);
 	writeChunk(&chunk, OP_SUBTRACT, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -103,8 +103,8 @@ void testVMDivide() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1.0, 2);
-	writeConstant(&chunk, 2.0, 2);
+	writeConstant(&chunk, NUMBER_VAL(1.0), 2);
+	writeConstant(&chunk, NUMBER_VAL(2.0), 2);
 	writeChunk(&chunk, OP_DIVIDE, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -122,8 +122,8 @@ void testVMMultiply() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1.0, 2);
-	writeConstant(&chunk, 2.0, 2);
+	writeConstant(&chunk, NUMBER_VAL(1.0), 2);
+	writeConstant(&chunk, NUMBER_VAL(2.0), 2);
 	writeChunk(&chunk, OP_MULTIPLY, 2);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -142,10 +142,10 @@ void testVMComplex() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1.2, 2);
-	writeConstant(&chunk, 3.4, 2);
+	writeConstant(&chunk, NUMBER_VAL(1.2), 2);
+	writeConstant(&chunk, NUMBER_VAL(3.4), 2);
 	writeChunk(&chunk, OP_ADD, 2);
-	writeConstant(&chunk, 5.6, 2);
+	writeConstant(&chunk, NUMBER_VAL(5.6), 2);
 	writeChunk(&chunk, OP_DIVIDE, 4);
 	writeChunk(&chunk, OP_NEGATE, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
@@ -164,10 +164,10 @@ void testChallenge1_1() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1, 2);
-	writeConstant(&chunk, 2, 2);
+	writeConstant(&chunk, NUMBER_VAL(1), 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
 	writeChunk(&chunk, OP_MULTIPLY, 2);
-	writeConstant(&chunk, 3, 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
 	writeChunk(&chunk, OP_ADD, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -185,10 +185,10 @@ void testChallenge1_2() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 2, 2);
-	writeConstant(&chunk, 3, 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
 	writeChunk(&chunk, OP_MULTIPLY, 2);
-	writeConstant(&chunk, 1, 2);
+	writeConstant(&chunk, NUMBER_VAL(1), 2);
 	writeChunk(&chunk, OP_ADD, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -206,10 +206,10 @@ void testChallenge1_3() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 3, 2);
-	writeConstant(&chunk, 2, 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
 	writeChunk(&chunk, OP_SUBTRACT, 2);
-	writeConstant(&chunk, 1, 2);
+	writeConstant(&chunk, NUMBER_VAL(1), 2);
 	writeChunk(&chunk, OP_SUBTRACT, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
@@ -227,13 +227,13 @@ void testChallenge1_4() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 1, 2);
-	writeConstant(&chunk, 2, 2);
-	writeConstant(&chunk, 3, 2);
+	writeConstant(&chunk, NUMBER_VAL(1), 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
 	writeChunk(&chunk, OP_MULTIPLY, 2);
 	writeChunk(&chunk, OP_ADD, 2);
-	writeConstant(&chunk, 4, 2);
-	writeConstant(&chunk, 5, 2);
+	writeConstant(&chunk, NUMBER_VAL(4), 2);
+	writeConstant(&chunk, NUMBER_VAL(5), 2);
 	writeChunk(&chunk, OP_NEGATE, 4);
 	writeChunk(&chunk, OP_DIVIDE, 4);
 	writeChunk(&chunk, OP_SUBTRACT, 4);
@@ -253,10 +253,10 @@ void testChallenge2_1() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 4, 2);
-	writeConstant(&chunk, 3, 2);
-	writeConstant(&chunk, 0, 2);
-	writeConstant(&chunk, 2, 2);
+	writeConstant(&chunk, NUMBER_VAL(4), 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
+	writeConstant(&chunk, NUMBER_VAL(0), 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
 	writeChunk(&chunk, OP_SUBTRACT, 4);
 	writeChunk(&chunk, OP_MULTIPLY, 4);
 	writeChunk(&chunk, OP_SUBTRACT, 4);
@@ -276,9 +276,9 @@ void testChallenge2_2() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 4, 2);
-	writeConstant(&chunk, 3, 2);
-	writeConstant(&chunk, 2, 2);
+	writeConstant(&chunk, NUMBER_VAL(4), 2);
+	writeConstant(&chunk, NUMBER_VAL(3), 2);
+	writeConstant(&chunk, NUMBER_VAL(2), 2);
 	writeChunk(&chunk, OP_NEGATE, 4);
 	writeChunk(&chunk, OP_MULTIPLY, 4);
 	writeChunk(&chunk, OP_NEGATE, 4);
@@ -307,7 +307,7 @@ void testChallenge4() {
 	Chunk chunk;
 	initChunk(&chunk);
 	
-	writeConstant(&chunk, 4, 2);
+	writeConstant(&chunk, NUMBER_VAL(4), 2);
 	writeChunk(&chunk, OP_NEGATE, 4);
 	writeChunk(&chunk, OP_RETURN, 4);
 
