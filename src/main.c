@@ -87,7 +87,10 @@ void test() {
 }
 
 int main(int argc, const char* argv[]) {
-	//run(argc, argv);
-	test();
+	if (argc > 1 && strcmp("test", argv[1]) == 0) {
+		test();
+	} else {
+		run(argc, argv);
+	}
 	return 0;
 }
