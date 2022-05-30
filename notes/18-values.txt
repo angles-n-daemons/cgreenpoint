@@ -88,3 +88,8 @@ Things not in the book to fix:
   - Ah they cast to a number before passing it in
   - Write constant was another bonus question. These bonus questions seem to hurt the ability to write stuff in the future. However they do challenge you in moving
 - Modify writeConstant to inspect the type and store it
+
+
+I've got a nasty little seg fault when the interpreter exits. I think that runtime errors trigger a segfault
+I'm going to try to figure out what's happening
+
