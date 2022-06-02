@@ -93,3 +93,8 @@ Things not in the book to fix:
 I've got a nasty little seg fault when the interpreter exits. I think that runtime errors trigger a segfault
 I'm going to try to figure out what's happening
 
+Now we're going to implement comparitors.
+
+We only create 3 new operators: EQUAL, GREATER, and LESS for 6 comparators (equal, not equal, greater, greater equal, less, less equal) to show that the higher level language might not map to the lower level language.
+
+We'll also create a separate function for == since we can evaluate values of differing types
