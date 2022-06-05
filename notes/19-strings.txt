@@ -121,3 +121,11 @@ Now I need to write some strings tests
 Maybe just having the string
 
 Then doing equality checks?
+
+Most languages provide lots of support for woking with strings. Access to individual characters, string length, changing case, splitting joining searching etc. When you create a language you'll want all of that, but for this book it's going to be kept minimal
+
+The only interesting operation we'll support on strings is +. If you use that operator on two string objects, it produces a new string that's a concatenation of the two operand. Since lox is dynamically typed, we can't tell which behavior is needed at compile time because we don't know the types of the operands until runtime.
+
+Thus the OP_ADD instruction dynamically inspects the operands and chooses the right operation.
+
+Here I created a concatenante function that is used by the vm. Then I need to also create a function that does takeString
