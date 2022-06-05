@@ -129,3 +129,8 @@ The only interesting operation we'll support on strings is +. If you use that op
 Thus the OP_ADD instruction dynamically inspects the operands and chooses the right operation.
 
 Here I created a concatenante function that is used by the vm. Then I need to also create a function that does takeString
+
+I want to do some cleanup before I move to the next chapter:
+1. Create an object directory
+2. Make the tests more uniform in API and output
+3. Split src directory into main and test

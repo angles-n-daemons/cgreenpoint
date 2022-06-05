@@ -4,7 +4,7 @@
 #include "vm/test_vm.h"
 #include "compiler/test_scanner.h"
 #include "compiler/test_compiler.h"
-#include "test_strings.h"
+#include "object/test_strings.h"
 
 void runTests() {
 	testChunk();

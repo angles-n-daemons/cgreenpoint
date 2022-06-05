@@ -1,8 +1,9 @@
 #ifndef cgreenpoint_memory_h
 #define cgreenpoint_memory_h
 
+#include <stdio.h>
 #include "common.h"
-#include "object.h"
+#include "object/object.h"
 
 #define ALLOCATE(type, count) \
     (type*)reallocate(NULL, 0, sizeof(type) * (count))

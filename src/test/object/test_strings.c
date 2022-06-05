@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "test_common.h"
+#include "../test_common.h"
 
 void testStrings() {
     printf("Strings tests starting\n");
