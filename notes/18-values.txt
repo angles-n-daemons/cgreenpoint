@@ -98,3 +98,15 @@ Now we're going to implement comparitors.
 We only create 3 new operators: EQUAL, GREATER, and LESS for 6 comparators (equal, not equal, greater, greater equal, less, less equal) to show that the higher level language might not map to the lower level language.
 
 We'll also create a separate function for == since we can evaluate values of differing types
+
+
+challenges
+
+1. We could remove the less operator, and then use a combination of the greater and equal ops to get all functionality:
+
+greater - greater
+greater equal - greater or equal
+less - not greater or equal
+less equal - not greater
+
+for adding instructions we could add operators that allow support greater equal and stuff like that

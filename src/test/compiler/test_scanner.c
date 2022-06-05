@@ -34,7 +34,7 @@ void testSingleOrDoubles() {
     runScannerTest(">>=<<====!!=");
 }
 
-void testStrings() {
+void testScanStrings() {
     runScannerTest("\"hello\"\"world\"");
 }
 
@@ -67,7 +67,7 @@ void testKeywords() {
 void testScanner() {
     testSingleCharacter();
     testSingleOrDoubles();
-    testStrings();
+    testScanStrings();
     testWhitespace();
     testComments();
     testIllegalCharacters();

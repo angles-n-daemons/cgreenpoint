@@ -1,0 +1,107 @@
+the vm can represent three types of values right now
+
+booleans, numbers and nil
+
+Those types have the most important thing in common they're immutable and they're small
+
+Numbers are the largest, they still fit in two 64 bit words. That's not that much space even for booleans
+
+Strings aren't as small however - they might have limits like 255 characters, that's still too much space to pay for every value
+
+We need a way to support values whose sizes vary
+
+This is what dynamic allocationa and the heap were built for
+
+We allocate as many bytes as we need, then we get a pointer to the memory we've created and keep track of it as it flows through the vm
+
+Using the heap for larger, variable sized values and the stack for smaller atomic ones leads to a two level representation.
+
+For small, fixed size types like numbers they can live directly in the Value struct itself
+
+If the object is larger, its data lives on the heap. Then the values payload is a pointer to that blob of memory
+
+Eventually we'll have a handful of heap allocated types like instances, functions, strings, etc
+
+Each type has its own unique data, but there's also state that they share that the garbage collector will use to manage memory
+
+We'll call this common representation "Obj". Each value who lives on the heap is an Obj. We can use a single new ValueType case to refer to all heap allocated objs
+
+A string object contains an array of characters. These are stored in a separate, heap-allocated array so that we set aside only as much room as needed for each string. We also store the number of bytes in the array. This isn't strictly necessary, but lets us tell how much memory is allocated for the string without walking the character array to find the null terminator.
+
+Because ObjString is an Obj, it needs the state all objs share. It accomplishes this by having its first field be an Obj. C specifies that struct fields are arranged in memory in the order that they're declared
+
+Also, when you nest structs, the inner structs fields are expanded in place
+
+So the memory for Obj and ObjString looks like this:
+
+Note how the first bytes of ObjString exactly line up with Obj. This is not a coincidence - C mandates it. This is designed to enable a clever pattern: you can take a pointer to a struct and safely convert it to a pointer to its first field and back.
+
+The key part of the spec is:
+
+6.7.2.1 13
+
+Within a structure object, the non-bit-field members and the units which bit-fields reside have addresses that increase in the order in which they are declared. A pointer to a structure object suitably converted, points to its initial member (or if that member is a bit field then to the unit in which it resides), and vice versa. There may be unnamed padding wityhin a structure object but not at its beginning.
+
+Given an ObjString*, you can safely cast it to Obj* and then access the type field from it. Every ObjString "is" an Obj in the OOP sense of is. Whgen we later add other object types, each struct will have an Obj as its first field. Any code that wants to work with all objects can treat them as base Obj* and ignore any other fields that may happen to follow.
+
+The other direction works too. Given an Obj* you can downcast it to an ObjString* (assuming the bytes are correctly there). We can do it with a macro
+
+Why not put the body of this function into the macro? The body of isObjType into the IS_STRING macro?
+
+It's because body uses value twice. A macros is expanded by inserting the argument expression every place the parameter name appears in the body. If a macro uses a parameter more than once, the expression gets evaluated multiple times.
+
+This is bad if the expression has side effects. Let's say if we put the body into the macro and then did something like:
+
+IS_STRING(POP())
+
+Then it would pop two values off the stack. Using a function fixes that
+
+I see now
+
+As long as we ensure that we set the type tag correctly whenever we create an object 0of some type, this macro will tell us when it's safe to cast a value to a specific object type. We can do that now using the next functions
+
+These two macros take a value that is expected to contain a pointer to a valid objstring on the heap.
+
+The first one returns the ObjString* pointer. The second one steps through that to return the character array itself, since that's what we'll often be needing.
+
+Okay so now our VM can represent string values. It's time to add strings to the language itself. As usual we begin in the front end. The lexer tokenizes string literals so its the parsers turn.
+
+The +1 offset and -2 on length for copying strings is to remove the quotes I think
+
+Okay so what does copystring do?
+
+First it creates heapChars (bytes allocated on the heap, of size length)
+
+Then it copies those chars from the original string to heapChars.
+It then adds the null char to the end of the string
+And then it returns the allocateString call
+
+Once we have the array, we copy over the characters from the lexeme and terminate it
+
+We need to terminate the string ourselves because the lexeme points at a range of characters in the source string
+
+Since ObjString stores the length explicitly, we could leave the array unterminated, but slapping a terminator costs one byte and lets us pass the string to C standard functions which expect a terminator
+
+You might wonder why the ObjString can't point back to the original characters in the source string. Some ObjStrings will be created dynamically at runtime as the result of string ops like concatenation. These strings obviously need to dynamically allocate memory for the characters which means the string needs to free that memory when it's no longer needed.
+
+If we had an objstring for a string literal and tried to free its character array that pointed to the original source, bad things would happen. So for literals we preemptively copy the characters over to the heap. This way, every ObjString reliably owns its character array and can free it.
+
+The real work of creating a string object happens in this function
+
+
+Like the previous macro, this mainly exists to avoid the need to redundantly cast a void* back to the desired type
+
+The actual functionality is here
+
+This chapter has a sea of helpers and macros to wade through. A lot of them will be reused which is positive for the upcoming chapters
+
+It allocates an object of the given size on the heap. Note that the size is not just the size of the object itself. The caller passes in the number of bytes so that there is room for the extra payload fields needed by the specific object type being created.
+
+Then it initializes the obj state - right now that's just the type tag
+
+This function returns to allocate string which finishes initializing the objstring fields. now we can compile and execute string literals
+
+
+So I've got the string stuff in place
+
+I've gotta add some tests

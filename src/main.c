@@ -5,10 +5,7 @@
 #include "vm/chunk.h"
 #include "debug.h"
 #include "vm/vm.h"
-#include "test/vm/test_chunk.h"
-#include "test/vm/test_vm.h"
-#include "test/compiler/test_scanner.h"
-#include "test/compiler/test_compiler.h"
+#include "test/tests.h"
 
 static void repl() {
 	char line[1024];
@@ -78,17 +75,9 @@ void run(int argc, const char* argv[]) {
 	freeVM();
 }
 
-void test() {
-	testChunk();
-	testVM();
-	testScanner();
-	testCompiler();
-	printf("all tests pass\n");
-}
-
 int main(int argc, const char* argv[]) {
 	if (argc > 1 && strcmp("test", argv[1]) == 0) {
-		test();
+		runTests();
 	} else {
 		run(argc, argv);
 	}
