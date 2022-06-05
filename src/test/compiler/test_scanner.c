@@ -65,6 +65,7 @@ void testKeywords() {
 }
 
 void testScanner() {
+    printf("testScanner starting\n");
     testSingleCharacter();
     testSingleOrDoubles();
     testScanStrings();

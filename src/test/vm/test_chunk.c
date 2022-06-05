@@ -55,6 +55,7 @@ void testConstant16() {
 }
 
 void testChunk() {
+	printf("testChunk starting\n");
 	testConstant();
 	testConstant16();
 	printf("testChunk ran successfully\n");

@@ -105,3 +105,19 @@ This function returns to allocate string which finishes initializing the objstri
 So I've got the string stuff in place
 
 I've gotta add some tests
+
+The segfaults and bus errors are back with the tests
+
+I'm going to try to see if i can get to the bottom of this
+
+Heisen-fucking-bug. Every time I try to look it goes away
+
+No worries, I'll give it a look another time
+
+For right now, I'll just stay the course with the chapter.
+
+Now I need to write some strings tests
+
+Maybe just having the string
+
+Then doing equality checks?

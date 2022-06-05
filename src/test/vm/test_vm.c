@@ -333,6 +333,7 @@ void testChallenges() {
 }
 
 void testVM() {
+	printf("testVM starting\n");
 	testVMBasic();
 	testVMConstant16();
 	testVMNegate();

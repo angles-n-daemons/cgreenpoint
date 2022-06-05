@@ -8,5 +8,6 @@ void runTest(const char* test, const char* expected) {
     initVM();
     interpret(test);
     freeVM();
-    printf("expected %s", expected);
+    printf("expected %s\n", expected);
+    printf("end test %s\n\n", test);
 }
