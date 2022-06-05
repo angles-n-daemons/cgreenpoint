@@ -1,0 +1,54 @@
+in implementing a hash table, you can convert variable names to numbers, then modulo the array. In doing so, you can still collide, but the bigger the modulo (more buckets) the less likely the collision
+
+Additionally, the load factor (num entries / current size) also plays into the likelihood of collision
+
+We are going to size and resize the array containing the values under the hood when this happens, but we won't wait until it's full
+
+Even with a very low load factor, collisions can occur.
+
+Strategies for mitigating collisions include:
+
+Chaining, where each element of the array points to a linked list with all the collided elements
+
+Walking - where you walk over the array if you collide with another element.
+
+Chaining is generally not ideal for modern usages, mostly because it scatters memory all over the place
+
+Open addressesing / closed hashing: all entries live directly in the bucket array, when two entries collide, we find a different bucket for them to use instead.
+
+It's called open addressing because may end up at an address outside its preferred one. It's called closed hashing because all of the elements stay inside the array
+
+
+Storing all entries in a single, big, contiguous array is great for keeping the memory representation simple and fast. But it makes all of the operations on the hash table more complex. WHen inserting an entry, its bucket may be full, sending us to look at another bucket. That bucket itself may be occupied and so on. The process of finding an available bucket is called probing, and the order that you examine buckets is a probe sequence.
+
+There are a number of algorithms for determining which buckets to probe and how to decide which entry goes in which bucket. There's a ton of research here because even slight tweaks can have a large performance impact. On a data structure as heavily used as hash_tables, that performance impact touches a very large number of real world problems across a variety of hardware
+
+In this book, we'll pick the simplest one that gest the job done efficiently. Linear probing. We look for an entry, we look in he first bucket the key maps to. If it's not there, we look at the next element ,and so on. if we reach the end, we wwrap around to the beginning
+
+Linear probing is also cache friendly. Because you access the addresses in order, it keeps the cpu cache lines full and happy. The bad thing is its clone to clustering. If a lot of values map to the same bucket, they can cluster near eachother which can degrade performance
+
+we still need to skip entries with a different modulo when probing because it could have been placed there
+
+We can now build ourselves a reasonably efficient table for storing variable names up to 8 characters long, but that limitation is annoying. In order to relax the last constraint, we need to take a string of any length and convert it to a fixed size integer
+
+Now we get the hash part of hash table, a hash function takes a blob of data and hashes it to produce a fixed-size integer hash code whose value depends on all the bits of the original data.
+
+A good hash function (ignoring secuirty) has three properties:
+
+1. It must be deterministic, ie same thing in, same thing out every time
+2. It must be uniform
+3. It must be fast. It is going to be used a lot
+
+One of the original names for hash table was scatter table (because it scatters data throughout the array)
+
+Hash came from the idea that a hash function chops up the input data and comes up with a nmber
+
+In this book, we're going to use FNV-1
+
+A hash table is an array of entries. As in our dynamic array earlier, we keep track of both the allocateed size of the array (capacity) and the number of key value pairs currently stored in it. The ration count to capacity is exactly the load factor of the hash table.
+
+Each entry is one of thses
+
+It's a simple key value pair. since the key is always a string, we store the ObjString pointer directly instead of wrapping it in a value. It's a little faster and smaller this way
+
+In cgreenpoint, we only need to support keys that are strings, handling other types of keys doesn't add much complexity. As long as you can compare two objects for equality and reduce them to a sequence of bits, it's easy to use them as hash keys
