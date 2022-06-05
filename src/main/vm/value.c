@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "../object.h"
+#include "../object/object.h"
 #include "../common.h"
 #include "value.h"
 #include "../memory.h"

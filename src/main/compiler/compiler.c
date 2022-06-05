@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../object.h"
+#include "../object/object.h"
 #include "../common.h"
 #include "../vm/chunk.h"
 #include "scanner.h"

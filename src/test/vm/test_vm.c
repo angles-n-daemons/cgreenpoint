@@ -343,5 +343,5 @@ void testVM() {
 	testVMMultiply();
 	testVMComplex();
 	testChallenges();
-	printf("testVM ran successfully\n");
+	printf("testVM completed\n");
 }

@@ -74,5 +74,5 @@ void testScanner() {
     testIllegalCharacters();
     testIdentifiers();
     testKeywords();
-    printf("testScanner ran successfully\n");
+    printf("testScanner completed\n");
 }

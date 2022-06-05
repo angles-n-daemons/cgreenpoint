@@ -4,7 +4,7 @@
 #include "../vm/vm.h"
 
 void runTest(const char* test, const char* expected) {
-    printf("compiler testing %s\n", test);
+    printf("testing greenpoint program '%s'\n", test);
     initVM();
     interpret(test);
     freeVM();

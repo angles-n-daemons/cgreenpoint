@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "common.h"
-#include "vm/chunk.h"
-#include "debug.h"
-#include "vm/vm.h"
+#include "main/common.h"
+#include "main/vm/chunk.h"
+#include "main/debug.h"
+#include "main/vm/vm.h"
 #include "test/tests.h"
 
 static void repl() {

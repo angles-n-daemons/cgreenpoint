@@ -7,6 +7,7 @@
 #include "object/test_strings.h"
 
 void runTests() {
+	printf("starting tests\n");
 	testChunk();
 	testVM();
 	testScanner();
