@@ -215,6 +215,8 @@ And if that's slow in your object-oriented language, then everything is slow
 
 The segfault is back
 
+This is a new segfault. I've found that when I do copy string, it returns an interned string
+
 Todo:
 - Create tests
 - Do challenges
