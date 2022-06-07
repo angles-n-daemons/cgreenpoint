@@ -52,3 +52,171 @@ Each entry is one of thses
 It's a simple key value pair. since the key is always a string, we store the ObjString pointer directly instead of wrapping it in a value. It's a little faster and smaller this way
 
 In cgreenpoint, we only need to support keys that are strings, handling other types of keys doesn't add much complexity. As long as you can compare two objects for equality and reduce them to a sequence of bits, it's easy to use them as hash keys
+
+okay so this is our hash function. It's the shortest decent one known. Brevity is a virtue in a book that aims to show you each line of code.
+
+The idea is simple, and many hash functions follow the same pattern. You start with some initial hash value, usually a constant with carefully chose math properties. Then you walk the data to be hashed. Each byte (or word) you mix the bits into the hash value somehow, then scrabmble the resulting bits around some.
+
+What it means to mix and scramble can get pretty sophisticated, but the goal is uniformity. We want the resulting hash values to be as widely scattered across the numberic range to avoid collisions and clustering
+
+The next thing we need to do is add things into the hash table.
+
+What we're going to do is create or find an entry for a given key. If the entry already exists (ie the retrieved value's key is not empty) we won't increment the load on the table, otherwise we will. Then we set the key and the values for the new entry
+
+Last thing we need to do is resize the table at some point
+
+This is how we manage the table's load factor. We don't grow when the capacity is completely full. Instead we grow the array before then, when the array becomes at least 75% full.
+
+Ideal max load factor varies based on the hash function, collision handling strategy and typical keysets you'll see. Since a toy language like greenpoint doesn't have real world datasets, it's hard to optimize this, and we picked 75% arbitratily. When you build your own hash tables, benchmark and tune this.
+
+We'll get to the implementation of adjustCapacity soon, let's look at findEntry though
+
+This function is the core of the hash table. It's responsible for taking a key and array of buckets and figuring out which bucket the entry belongs in. This function is also where linear probing and collision handling come into play.
+
+There isn't much to it, first we modulo the has code to map the number to an index within bounds in the table
+
+This gives us a bucket where ideally we'll be able to find or place the entry
+
+There are a few case to check for
+- if the key for the entry at the array index is NULL, then the bucket is empty. If we're using findEntry to look up something in the hash table this means it isn't there. If we're using it to insert it, it means we've found a place to add the new entry.
+
+If the key in the bucket is equal to the key we're looking for, then that key is already present in the table. If we're doing a lookup that's good, we've found the key we're looking for. If we're doing an insert, it means we'll be replacing the value for that key instead of adding a new entry
+
+It looks like we're == to see if two strings are equal, this won't work. We'll solve this later on
+
+
+Otherwise the bucket has an entry in it but with a different key. This is a collision. In that case, we start probing. That's what the for loop does. We start at the bucket where the entry would ideally go. Otherwise we advance to the next element - this is the linear part of linear probing and check there. if we go past the end of the array , that second modulo operator wraps us back around to the beginning.
+
+We exit the loop when we either find an empty bucket with the same key as the one we're looking for. You might be wondering about an infinite loop. What if we collide with every bucket?
+
+That can't happen because of our load factor. Because we grow the array as soon as it gets close to being full, we know there will be empty buckets.
+
+We return directly from within the loop, yielding a pointer to the found Entry so that the caller can either insert something into it or read from it. Wayback in tableSet, the function that first kicked this off we store the new entry in that returned bucket and we're done.
+
+Allocating and resizing.
+
+Before we can put entries in the hash table, we do need a place to actually store them. We need to allocate an array of buckets. That happens in this function.
+
+static void adjustCapacity
+
+interesting, like I supposed when you get bytes allocated you have no guarantee as to whats inside of them
+
+we create a bucket array with capacity entries. After we allocate the array, we init every element to be an empty bucket and then store the array (and its capacity) in the hash table's main struct. This code is fine for when we insert the first entry into the table, and we require the first allocation of the array. But what about when we already have one and need to grow it.
+
+Back when we were doing a dynamic array, we could just use realloc and let the C standard library copy everything over.
+
+That doesn't work for the hash table. Remember that to choose the bucket for each entry, we have to take the hash key and modulo its size. That means when the array size changes, entries may end up in different buckets.
+
+We walk the old array front to back. At time we find a non-empty bucket, we insert that entry into the new array. We use findEntry, passing in the new array instead of the one currently stored in the table.
+
+After that's done, we can release the memory for the old array.
+
+With that, we have a hash table that we can stuff as many entries into that we like. It handles overwiting existing keys and growing itself as needed to maintain the desired load capacity.
+
+While we're at it, let's also deinfe a helper function for copying all of the netries of one hash table into another;
+
+Retrieving values:
+
+Now that our hash taable contains some stuff, let's start pulling things back out.
+
+Given a key, we can look up the corresponding value with this function.
+
+You pass in a talbe and a key, if it finds an entry with that key, it returns true otherwise false. If the entry exists, it populates the avlue passed in with the resulting value
+
+Since findEntry does the hard work, the implementation isn't too bad
+
+Deletihng entries
+
+There is one more fundamental operation a full-featured hash table needs to support. Removing an entry. This seems pretty obvious, if you can add things, you should be able to un-add them right?
+
+But you'd be surpirsed how many tutorials on hash tables omit this.
+
+I could have taken that route too. In fact, we use deletion in cgreenpoint in a tiny edge case in the vm. But if you want to understand how to completely implement a hash table, this feels important. I can sympathize with their desire to overlook it. As we'll see, deleting from a hash table that uses open addressing is tricky.
+
+The reason for this is if you leave a in a sequence of filled buckets, you would break linear probing. It would stop probing once it reached the deleted entry without realizing that it was previously filled.
+
+How we can solve this is to use a trick called tombstones. Instead of clearing the entry on deletion, we replace it with a special sentinal entry called a tombstone.
+
+When we are following a probe and we hit a tombstone, we keep going (instead of stopping).
+
+First we find the bucket containing the entry we want to delete. If we don't find it, there's nothing to delete so we bail out. We replace the entry with a tombstone. In cgreenpoint, we use a NULL key and true value to represent that. But any representation that can't be confused with an empty bucket or valid entry works.
+
+That's all we need to do to delete an entry. Simple and fast. But all of the other operations need to correctly handle tombstones too. A tombstone is a sort of half entry. It has some of the characteristics of a present entry and some of the characteristics of an empty one.
+
+
+When we are following a probe sequence during a lookup and we hit a tombstone, we note it and keep going.
+
+If we reach a truly empty entry, then the key isn't present. In that case if we've passed a tombstone we return its bucket instead of a later one.
+
+If we find a tombstone and we haven't passed one yet, we store it's value for tracking. It's important that the first found tombstone only is used, to reduce the number of probes a linear probing sequence needs to do.
+
+One of the problems now is that this causes the load factor to stay stagnant even when we're deleting entries. we don't want to reduce it without thinking though, because if we add tombstones but reduce the load factor, we could end up with an array that's filled with entries and tombstones and linear probing could lead to an infinite loop.
+
+So how do we want to count tombstones when calculating the load factor?
+
+If we treat tombstones like full buckets, we may end up with a bigger array than we probably need because it artifically inflates the load factor. There are tombstones we could result, but they aren't treated as unused so we end up growing the array prematurely.
+
+iIf we treat tombstones like empty buckets and don't include them in the load factor, we run the risk of ending up with no actual empty buckets to terminate a lookup. An infinite loop is much worse problem than a few extra array slots, so we consider tombstones to be full buckets.
+
+That's why we don't reduce the count when deleting an entry in the previous code. The count is no longer the number of entries in the table, it's the count of entries and tombstones.
+
+Now we'll only increment the count during insertion if the value is NIL
+
+If we are replacing a tombstone with a new entry, the bucket has already been accounted for and the count doesn't change.
+
+When we resize the array, we allocate a new array and re-insert all of the existing entries into it. During that process, we don't copy the tombstones over.
+
+They don't add any value since we're rebuilding the probe sequences anyway, and would just slow down lookups. That means we need to recalculate the count since it may change during a resize. So we clear it out.
+
+Then each time we find a non-tombstone entry we increment it
+
+This means when we grow the capacity we may end up with fewer entries in the resulting larger array because all of the tombstones get discarded. That's a little wasteful, but not a huge practical problem.
+
+I find it interesting that much of the work to support deleting entries is in findEntry and adjustcapacity. The actual delete logic is quite simple and fast.
+
+In practice deletions are rare, so you'd expect a hash table to do as much work as it can in the delete function and leave the other functions alone to keep them faster. With our tombstone approach, deletes are fast, but lookups get penalized. I did a little benchmarking to test this out in a few deletion scenarios. I was surprised to discover that tombstyones did end up being faster overall than doing all the work during the deletion to reinsert the affected entries.
+
+But if you think about it it's not that the tombstone approach pushes the work of fully deleting an entry to other operations, it's more that it makes deleting lazy. At first, it does the minimal work to turn the entry into a tombstone. That can cause a penalty later when lookups have to skip over it. But it also allows that tombstone bucket to be reused by a later insert too. That reuse is a very efficient way to avoid the cost of rearranging all of the following affected lentries. You basically recycle a node in the chain of probed entries. It's a neat trick.
+
+We've got ourselves a hash table that mostly works, though it has a critical flaw in its center. Also, we aren't using it for anything yet. It's time to address both of those and in the process learn a classic technique used by interpreters.
+
+The reason the hash table doesn't totally work is that when findEntry checks to see if an existing key matches the one its looking for. It uses == to compare the two strings for equality. That only returns true if the two keys are the exact same string in memory. Two separate strings with the same characters should be considered equal but aren't.
+
+Remember, back when we added strings in the last chapter, we added explicit support to compare the strings character-by-character in order to get true value equality. We could do that in findEntry, but that's slow.
+
+Instead we'll use a technique called string interning. The core problem is that it's possible to have different strings in memory with the same characters. Those need to behave like equivalent values even thoguh they are distinct objects. They're essentially duplicates, and we have to compare all of their bytes to detect that. String interning is a process of deduplication. We create a collection of interned strings. Any string in that collection is guaranteed to be textually distinct from all others. When you intern a string, you look for a matching string in the collection. If found, you use that original one. Otherwise, the string you have is unique so you add it to the collection.
+
+iIn this way, you know that each sequence of characters is represented by only one string in memory. This makes value equality trivial. If two strings point to the same address in memory, they are obviously the same string and must be equal. And because we know stirngs are unique, if two strings point to different addresses they must be distinct strings.
+]
+
+Thus pointer equality exactly matches value equality. Which in turn means that our existing == in findEntry() does the right thing.
+
+Or at least it will once we intern all the strings. In order to reliably deduplicate all the strings, the VM needs to be able to find every string that's been created. We do that by giving it a hash table to store them all.
+
+It looks like we copied findEntry with tableFind string but there are key differences (a little copying is better than a little dependency).
+
+First, we pass in the raw character array of the key we're looking for instead of the objstring.
+
+At the point that we call this, we havne't created an objstring yet
+
+Second, when checking to se if we found the key, we look at the actual strings, We first see if they have actual matching lengths and hashes. those are quick to check and if they aren't equal the strings definitely aren't the same.
+
+If there's a hash collision, we do an actual character by character string comparison. This is the one place in the VM where we actually test strings for textual equality. We do this here to deduplicate strings and the rest of the VM can take for granted that any two strings at different addresses in memory must have different contents.
+
+In fact, now that we've interned all the strings, we can take advantage of it in the bytecode interpreter
+
+We've added a little overhead when creating strings to intern them. In return, at runtime, the equality operator on strings is much faster. WIth that we have a fully featured hash table ready for us to use for tracking variables, instances or any other key-value pairs that might show up;.
+
+We also sped up testing strings for equality. This is nice for when a user does == on strings
+
+If testing a string for equaqlity is slow, that means lookup up a mehtod by name is slow
+
+And if that's slow in your object-oriented language, then everything is slow
+
+The segfault is back
+
+Todo:
+- Create tests
+- Do challenges
+- Reorganize imports
+
