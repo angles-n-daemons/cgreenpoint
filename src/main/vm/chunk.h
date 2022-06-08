@@ -2,7 +2,7 @@
 #define cgreenpoint_chunk_h
 
 #include "../common.h"
-#include "value.h"
+#include "../object/value.h"
 
 typedef enum {
     OP_CONSTANT,

@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "../../common.h"
-#include "../../debug.h"
-#include "../../vm/chunk.h"
+#include "../../main/common.h"
+#include "../../main/vm/debug.h"
+#include "../../main/vm/chunk.h"
 
 void testConstant() {
 	Chunk chunk;

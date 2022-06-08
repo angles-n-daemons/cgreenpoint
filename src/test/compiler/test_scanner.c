@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-#include "../../common.h"
-#include "../../compiler/scanner.h"
+#include "../../main/common.h"
+#include "../../main/compiler/scanner.h"
 
 void runScannerTest(const char* source) {
     initScanner(source);

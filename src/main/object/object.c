@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../memory.h"
+#include "../util/memory.h"
 #include "object.h"
 #include "table.h"
-#include "../vm/value.h"
+#include "value.h"
 #include "../vm/vm.h"
 
 #define ALLOCATE_OBJ(type, objectType) \

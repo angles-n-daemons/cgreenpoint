@@ -3,7 +3,7 @@
 #include <string.h>
 #include "main/common.h"
 #include "main/vm/chunk.h"
-#include "main/debug.h"
+#include "main/vm/debug.h"
 #include "main/vm/vm.h"
 #include "test/tests.h"
 

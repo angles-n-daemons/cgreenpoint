@@ -2,7 +2,7 @@
 #define cgreenpoint_object_h
 
 #include "../common.h"
-#include "../vm/value.h"
+#include "value.h"
 
 #define OBJ_TYPE(value)     (AS_OBJ(value)->type)
 

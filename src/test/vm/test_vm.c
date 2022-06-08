@@ -4,8 +4,8 @@
 #include <time.h>
 
 #include "test_vm.h"
-#include "../../vm/chunk.h"
-#include "../../vm/vm.h"
+#include "../../main/vm/chunk.h"
+#include "../../main/vm/vm.h"
 
 void testVMBasic() {
 	// setup

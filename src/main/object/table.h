@@ -3,7 +3,7 @@
 
 
 #include "../common.h"
-#include "../vm/value.h"
+#include "value.h"
 
 typedef struct {
     ObjString* key;
