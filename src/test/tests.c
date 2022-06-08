@@ -5,6 +5,7 @@
 #include "compiler/test_scanner.h"
 #include "compiler/test_compiler.h"
 #include "object/test_strings.h"
+#include "object/test_table.h"
 
 void runTests() {
 	printf("starting tests\n");
@@ -13,5 +14,6 @@ void runTests() {
 	testScanner();
 	testCompiler();
   testStrings();
+	testTable();
 	printf("all tests pass\n");
 }
