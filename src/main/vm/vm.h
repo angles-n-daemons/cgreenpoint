@@ -1,9 +1,10 @@
 #ifndef cgreenpoint_vm_h
 #define cgreenpoint_vm_h
 
-#include "chunk.h"
 #include "../object/value.h"
 #include "../object/table.h"
+
+#include "chunk.h"
 
 #define STACK_MAX 512
 

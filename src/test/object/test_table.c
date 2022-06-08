@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../../main/object/table.h"
 #include "../../main/object/object.h"
+#include "../../main/object/table.h"
 
 void testBasic() {
     Table table;

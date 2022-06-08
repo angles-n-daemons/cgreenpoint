@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../object/object.h"
 #include "../common.h"
+#include "../object/object.h"
 #include "../vm/chunk.h"
+
 #include "scanner.h"
 
 #ifdef DEBUG_PRINT_CODE

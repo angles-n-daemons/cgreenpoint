@@ -3,9 +3,10 @@
 #include <stdint.h>
 #include <time.h>
 
-#include "test_vm.h"
 #include "../../main/vm/chunk.h"
 #include "../../main/vm/vm.h"
+
+#include "test_vm.h"
 
 void testVMBasic() {
 	// setup

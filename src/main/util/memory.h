@@ -2,6 +2,7 @@
 #define cgreenpoint_memory_h
 
 #include <stdio.h>
+
 #include "../common.h"
 #include "../object/object.h"
 

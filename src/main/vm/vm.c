@@ -1,10 +1,12 @@
 #include <stdarg.h>
+
 #include "../common.h"
-#include "../debug.h"
-#include "vm.h"
 #include "../compiler/compiler.h"
-#include "../memory.h"
-#include "value.h"
+#include "../object/value.h"
+#include "../util/memory.h"
+
+#include "debug.h"
+#include "vm.h"
 
 VM vm;
 
