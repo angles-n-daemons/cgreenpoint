@@ -1,0 +1,67 @@
+allocating a new hash table each time you enter a block or call a function is not a great route for a fast vm
+
+Given how much code is concerned with the variables, if the variables are slow then everything is slow for cgreenpoint we'll improve that by using a much more efficient strategy for local variables, but globals aren't as easily optimized
+
+Global variables in greenpoint are late bound or resolved dynamically. that means you can compile a chunk of code that refers to a global variable before its defined
+
+As long as the code doesn't execute before the definition happens, everything is fine. in practice that means you can refer to later variables inside the body of functions
+
+code like that might seem odd, but it's handy for defining mutually recursive functions. it also plays nicer with the repl
+
+you can write a function on one line, then define the variable on the next
+
+Local variables work a little differently, since a local variable's declaration always occurs before it is used, the vm can resovle them at compile time, even in a simple single pass compiler.
+
+That will let us use a smarter representation for locals. That's in the next chapter though
+
+For now let's worry about globals
+
+Variables come into being using variable declarations, which means now is also a time to add support for statements to our compiler. As you recall, greenpoint splits statements into two categories.Declarations, are those that bind a new name to a vale. The other kinds of statements, control flow, print, etc are just called statements. we disallow declarations directly inside control flow statements, like this:
+
+if (monday) var croissant = "yes"; // Errors out
+
+Allowing it would raise confusing questions aroudn the scope of the variable.
+
+So like other languages, we prohibit it syntactically by having a separate grammar rule for the subset of statements that are allowed inside a control flow body.
+
+statement -> exprStmt
+          | forStmt
+					| ifStmt
+					| printStmt
+					| block
+
+
+decl -> clasDecl
+     | funDecl
+		 | varDecl
+		 statement;
+
+you can put declarations inside block statements
+
+In this chapter, we'll only cover a couple of statements and one declaration
+
+statement -> exprStmt
+          |  printStmt
+
+declaration -> varDecl
+            |  statement
+
+
+We'll get to variable declarations later in the chapter, so for right now let's just work on h
+
+Note that nothing is pushed after we pop for printing
+
+Each bytecode instruction has a stack effect that describes how the instruction modifies the stack.
+
+For example, ADD pops two and pushes one
+
+Each expression leaves one result on the stack
+
+The bytecode for an entire statement has a stack effect of 0. Since a statement produces no values, it leaves the stack unchanged - thgough int of course uses the stack while it's doing its thing. This is important when we get to control frlow and looping
+
+We can also delete the return handler, now that we have statements and print wee don't need 
+
+NOTE: for the statment, we're printing the compiled expression, which means we don't need it after the print
+
+The bus error is back.
+It looks like the stack isn't initialized correctly;
