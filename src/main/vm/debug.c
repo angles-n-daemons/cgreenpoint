@@ -15,9 +15,9 @@ static int simpleInstruction(const char* name, int offset) {
     return offset + 1;
 }
 
-static int constantInstruction(Chunk* chunk, int offset) {
+static int constantInstruction(const char* name, Chunk* chunk, int offset) {
     uint8_t constant = chunk->code[offset + 1];
-    printf("%-16s %4d '", "OP_CONSTANT", constant);
+    printf("%-16s %4d '", name, constant);
     printValue(chunk->constants.values[constant]);
     printf("'\n");
     return offset + 2;
@@ -67,15 +67,19 @@ int disassembleInstruction(Chunk* chunk, int offset) {
         case OP_NEGATE:
             return simpleInstruction("OP_NEGATE", offset);
         case OP_CONSTANT:
-            return constantInstruction(chunk, offset);
+            return constantInstruction("OP_CONSTANT", chunk, offset);
         case OP_CONSTANT_16:
             return constantInstruction16(chunk, offset);
         case OP_NIL:
             return simpleInstruction("OP_NIL", offset);
-        case OP_FALSE:
-            return simpleInstruction("OP_FALSE", offset);
         case OP_TRUE:
             return simpleInstruction("OP_TRUE", offset);
+        case OP_FALSE:
+            return simpleInstruction("OP_FALSE", offset);
+        case OP_POP:
+            return simpleInstruction("OP_POP", offset);
+        case OP_DEFINE_GLOBAL:
+            return constantInstruction("OP_DEFINE_GLOBAL", chunk, offset);
         default:
             printf("Unknown opcode %d\n", instruction);
             return offset + 1;
