@@ -1,4 +1,5 @@
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "../common.h"
 #include "../compiler/compiler.h"
@@ -46,6 +47,10 @@ void push(Value value) {
 }
 
 Value pop() {
+    if (vm.stack == vm.stackTop) {
+        printf("cannot pop, empty stack\n");
+        exit(1);
+    }
     vm.stackTop--;
     return *vm.stackTop;
 }
@@ -95,13 +100,7 @@ static InterpretResult run() {
 
 #ifdef DEBUG_TRACE_EXECUTION
         // Print the stack
-        printf("          ");
-        for (Value* slot = vm.stack; slot < vm.stackTop; slot++) {
-            printf("[ ");
-            printValue(*slot);
-            printf(" ]");
-        }
-        printf("\n");
+        printStack(vm.stack, vm.stackTop);
 
         // Disassemble the instruction
         disassembleInstruction(vm.chunk, (int)(vm.ip - vm.chunk->code));
@@ -124,6 +123,16 @@ static InterpretResult run() {
             case OP_TRUE: push(BOOL_VAL(true)); break;
             case OP_FALSE: push(BOOL_VAL(false)); break;
             case OP_POP: pop(); break;
+            case OP_GET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                Value value;
+                if (!tableGet(&vm.globals, name, &value)) {
+                    runtimeError("Undefined variable '%s'", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                push(value);
+                break;
+            }
             case OP_DEFINE_GLOBAL: {
                 ObjString* name = READ_STRING();
                 tableSet(&vm.globals, name, peek(0));
@@ -184,8 +193,6 @@ static InterpretResult run() {
                 break;
             }
             case OP_RETURN: {
-                printValue(pop());
-                printf("\n");
                 return INTERPRET_OK;
             }
         }

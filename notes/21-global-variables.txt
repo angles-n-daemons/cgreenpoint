@@ -65,3 +65,7 @@ NOTE: for the statment, we're printing the compiled expression, which means we d
 
 The bus error is back.
 It looks like the stack isn't initialized correctly;
+
+Global variables kinda work, but it looks like there's an error in retrieving them
+
+So it looks like the stack seems like the stack stays empty the next time I push something
