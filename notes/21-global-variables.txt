@@ -206,3 +206,9 @@ I think that the issue might be that the strings aren't being interned correctly
 Next up I'd like to verify the following:
 1. When strings should NOT be duplicated
 2. How to prevent ObjString duplication so that interning works correctly
+
+Okay i wasn't setting the values in the strings table
+
+Back to our regularly scheduled programming
+
+To fix this, variable should look for and consume the = only if it's in the context of a low precedence expression. The code that knows the current precedence is, logically enough parsePrecedence. the variable() function doesn't need to know the actual level. it just cares that the precednec is low enough to allow assignment so we pass that fact in as a boolean
