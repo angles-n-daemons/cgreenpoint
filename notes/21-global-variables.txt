@@ -100,4 +100,30 @@ We don't need much lookahead to realize the beverage should be compiled as a set
 
 Variables are even easier since they are just a single bare identifier before an =. The idea then is that right before compiling an expression that can also be used as an assignment target, we look for a subsequent = token. If we see one, we compile it as an assignment or setter instead of a variable access or getter.
 
+We don't have setters to worry about yet, so all we need to handle are variables
 
+In the parse function for identifier expressions, we look for an equals sign after the identifier. If we find one, instead of emitting code for a variable success, we compile the assigned value and then emit an assignment instruction.
+
+That's the last instruction we need to add in this chapter
+
+As you'd expect, the runtime behavior is similar to deifining a variable.
+
+The main difference is what happens when the key doesn't already exist in the globals hash table. If the variable hasn't been defined yet, it's a runtime error to try to assign it.
+
+Lox doesn't do implicit variable declaratin
+
+The other difference is that setting a variable doesn't pop the value off the stack. Remember an assignment is an expression so it needs to leave that value there in case the assignment is nested inside some larger expression.
+
+Add a dash of disassembly
+
+We're done right? Not yet
+
+Consider a * b = c + d;
+
+According to Lox's grammar, = has the lowest precedence so this should be parsed like
+
+     =
+  *     +
+a   b  c  d
+
+Obviously a * b isn't a valid assignment target, so this should be a syntax error

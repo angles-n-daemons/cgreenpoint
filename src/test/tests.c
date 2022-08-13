@@ -6,6 +6,7 @@
 #include "compiler/test_compiler.h"
 #include "object/test_strings.h"
 #include "object/test_table.h"
+#include "object/test_variables.h"
 
 void runTests() {
 	printf("starting tests\n");
@@ -15,5 +16,6 @@ void runTests() {
 	testCompiler();
   testStrings();
 	testTable();
+	testVariables();
 	printf("all tests pass\n");
 }
