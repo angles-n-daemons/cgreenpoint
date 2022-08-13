@@ -127,3 +127,82 @@ According to Lox's grammar, = has the lowest precedence so this should be parsed
 a   b  c  d
 
 Obviously a * b isn't a valid assignment target, so this should be a syntax error
+
+Okay found a difficult bug:
+
+When I try to run the following commands independent of each other:
+
+var a = 5;
+a = 4;
+
+It runs fine. However if I try to run them as the same program
+
+var a = 5; a = 4;
+
+It fails, it says that a is undefined.
+
+For some reason the set changes on define don't persist to the point where I need them
+
+I've verified this behavior by modifying the VM so that on variable define it does both tableSet and tableGet
+
+
+                tableSet(&vm.globals, name, peek(0));
+                Value value;
+                tableGet(&vm.globals, name, &value);
+                printValue(value);
+
+and the value is nil
+
+Somethign really strange is going on.
+What if I call tableGet inside tableSet?
+
+what should I do
+
+call findEntry after the value is set
+
+okay going to wipe away the changes
+
+What I'm going to add is in:
+
+tabledefine
+ check the value after it's set, see if it's still nil
+tableSet
+ check tableget after the value is set, see if it's 5
+
+Curious, table capacity is 8, and the thing seems to get set. But there's nothing to indicate it's working afterwards.
+
+The strangest part of this whole exercise is that the next pass of run shows the value
+
+I'm curious whether the table capacity gets overridden
+
+
+Okay new news, it turns out like the pointer from tableSet and tableGet findEntry is different.
+
+Next steps:
+1. Figure out if the next call to tableGet (one that works) has the same pointer as tableGet
+2. Try to figure out why the pointer values change
+
+Okay for #1 it seems like the pointer value is DIFFERENT. My mind is a little scrambled right now, but we're going to get to the bottom of this
+
+Going to reset the print statements again - and make the following changes:
+1. Inside of tableSet, I'm going to print the pointer location of the entry
+2. Inside of tableGet, I'm going to print the pooitner location of the entry
+
+This means that something weird is happening inside of findEntries (or to the parameters it takes);
+
+One thing I could check is to just see if entries stays the same for it.
+Remove that once you're done
+
+Could this be the wacky tombstone tracking?
+
+Okay so the issue is that the objectstrings are different. This is even though they have the same value
+
+What happens is the findEntry lookup fails on the right key, because ObjString addresses (and not character sequences) is compared
+
+I need to figure out why the strings aren't being de-duplicated, is that in the vm or the object file
+
+I think that the issue might be that the strings aren't being interned correctly.
+
+Next up I'd like to verify the following:
+1. When strings should NOT be duplicated
+2. How to prevent ObjString duplication so that interning works correctly

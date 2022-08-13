@@ -4,7 +4,7 @@
 
 
 void testSimpleVariables() {
-    runTest("var a = 5;", "5");    
+    runTest("var a = 5; a = 4; print a;", "4");
 }
 
 void testVariables() {
