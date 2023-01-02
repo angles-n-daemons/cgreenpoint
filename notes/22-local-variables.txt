@@ -1,0 +1,32 @@
+The last chapter introduced variables to cgreenpoint but only the global type
+
+In this chapter, we'll extend that to support blocks, block scope, and local variables
+
+In jlox, we managed to pack all of that and globals into one chapter
+
+For clox that's two chapters worth of work because everything takes more effort in c
+
+Global variables are late bound in greenpoint. late means "resolved after compile time". That's good for keeping the compiler simple, but not great for performance. Local variables are one of the most used parts of a language. If locals are slow, everything is slow. So we want a strategy for local variables that's as efficient as possible/
+
+Fortuately lexical scoping is here to help us. as the name implies, lexical scope means we can resolve a local variable just by looking at the text of the program. Local variables are not late bound. Any processing work we do in the compiler is work we don't have to do at runtime, so our implementation of local variables will rely heavily on the compiler.
+
+
+The nice thing about hacking on a programming language is there's a long lineage of other languages to learn from. So how do c and java manage their local variables? The stack of course! They typically use the native stack mechanisms supported by the chip and os. That's too low level for us, but inside of clox we have our own stack to use. Right now we only use it for holding onto temporaries - short lived blobs of data that we need to remember while computing an expression. As long as we don't get in the way of those, we can stuff our local variables onto the stack too.
+
+This is great for performance. Allocating space for a new local requires only incrementing the stackTop pointer, and freeing is likewise a decrement.
+
+Accessing a variable from a known stack slot is an indexed array lookup.
+
+We need to be careful though, the vm expects the stack to behave like a stack. We have to be okay with allocating new locals only on the top of the stack, and we have to accept taht we can discard a local only when nothing is above it on the stack. Also we need to make sure that temporaries don't interfere.
+
+Conveniently the design of lox is in harmony with these constraints. New locals are always created by declaration statements. Statements don't nest inside of expresssions, so there are never any temporaries on the stack when a statement begins executing. Blocks are strictly nested. When a block ends, it always takes the innermost, most recently declared locals with it
+
+Since those are also the locals that came into scope last, they should be on the top of the stack where we need them.
+
+See how they fit a stack perfectly? It seems that the stack will work for storing locals at runtime. But we can go further than that. Not only do we know that they will be on the stack, but we can even pin down precisely where they will be on the stack. Since the compiler knows exactly which local variables are in scope at any point in time, it can effectively simulate the stack during compilation and note where in the stack each variable lives.
+
+We'll take advantage of this by using these stack offsets as operands for the bytecode instructions that read and store local variables.
+
+This makes working with locals fast, as simple as indexing into an array.
+
+There's a lot of state we need to track in the compiler to make this work, so let's get started there. In greenpoint, we used a linked-chain of "environment hash maps to keep track which local variables were in scope. That's the classic schoolbook way of representing lexical scope. For cgreenpoint we're getting closer to the metal. All state lives in a new struct
