@@ -30,3 +30,29 @@ We'll take advantage of this by using these stack offsets as operands for the by
 This makes working with locals fast, as simple as indexing into an array.
 
 There's a lot of state we need to track in the compiler to make this work, so let's get started there. In greenpoint, we used a linked-chain of "environment hash maps to keep track which local variables were in scope. That's the classic schoolbook way of representing lexical scope. For cgreenpoint we're getting closer to the metal. All state lives in a new struct
+
+We have a simple flat array of all locals that are in scope during each point of the compilation process. They are ordered in the array in the order that their declarations appear in code. Since the instruction operand we'll use to encode a local is a single byte, our VM has a hard limit on the number of locals that can be in scope at once. That means we'll give the locals array a fixed size.
+
+In the compiler struct, the local count field tracks how many locals are in scope. how many of those array slots are in use. We also track the "scope depth". This is the number of blocks surrounding the current bit of code we're compiling.
+
+Our kotlin interpreter used a chain of maps to keep each blocks variables separate from other blocks. This time we'll simply number variables with the level of nesting they appear. Zero is the global scope, one is the first top level block, two is inside that, so on and so forth. We use this to track which block each local belongs to so that we know to discard locals when a block ends.
+
+Each local in the array is a new struct
+
+We store the name of the variable. When we're resolving an identifier, we compare the identifier's lexeme with each local's to find a match. It's pretty hard to resolve a variable when you don't know its name. The depth records the scope depth of the block where the local variable was declared. That's all the state we need for now.
+
+This is a very different representation than the one we had in greenpoint, but it lets us answer all of the same questions our compiler needs to ask of the local environment. The next step is figuring out how the compiler gets at this state. If we were principled engineers, we'd give each function in the front end a parameter that accepts a pointer to the compiler.
+
+We'd create a compiler at the beginning and the end and thread it carefully through each function call. but that would mean rewriting a lot of code we already wrote, so we'll just include a global variable
+
+Here's a function to init the compiler
+
+Our compiler has the data it needs, but not the operations on that dat. There's no way to create and destroy scopes, or add and resolve variables. We'll add those as we need them. First let's start building some language features
+
+Declaring local variables
+
+usually we start with parsing here, but our compiler already supports parsing and compiling variable declarations. We've got var statements, identifier expressions and assignment in there now. It's just that the compiler assumes all variables are global. We don't need any parser support, we just need to hook up the new scoping semantics to the existing code.
+
+functions are a big chunk of work in a later chapter, for now we're only going to do blocks. the new grammar introduced is:
+
+block -> "{" declaration* "}" ;
