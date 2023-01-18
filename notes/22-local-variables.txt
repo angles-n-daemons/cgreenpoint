@@ -56,3 +56,146 @@ usually we start with parsing here, but our compiler already supports parsing an
 functions are a big chunk of work in a later chapter, for now we're only going to do blocks. the new grammar introduced is:
 
 block -> "{" declaration* "}" ;
+
+Blocks are a kind of statement, so the rule for them goes in the statement production. the corresponding code to compile one looks like:
+
+Our compiler supports parsing and compiling variable declarations. We've got var statement,s identifier expressions and assignment in there now. It's just that the compiler assumes all variables are global. We don't need any new parsing support we just need to hook up the new coping semantics to the existing code
+
+Variable declaration parsing begins in varDeclaration and relise on a few other functions. First parseIdentifier() consumes the identifier token for the variable name, adds it's lexeme to the chunks constant table as a astring then returns the constant table index where it was aded. Then after varDeclaration() compiles the initializer, it calls definevariable to emit the bytecode for storing the variable's value in the global hash table.
+
+Both of those helpers need a few changes to support local variables.
+
+In parseVariable() we add:
+
+first we declare the variable, we'll get to that in a second. After that we exit the function if we're in a local scope. at runtime locals aren't looked up by name. There's no need to stuff the variable name into the constant table, so the declaration is inside a local scope where we return a dummy table index instead.
+
+over in defineVariable() we need to emit the code to store a local variable if we're in a local scope
+
+We basically short circuit define variable if the scope is greater than 0. We is no code to create a local variable at runtime. Think about the state that the vm is in. it already executed the code for the variable's initializer and that value is sitting right on top of the stack, as the only remaining temporary
+
+It has already executed the code for the variables initializer
+
+Weird, so it seems like it just pushes stuff on the stack in this case
+
+Okay so this is where the compiler records the existence of the varaible. We do this only for locals so if we're in the global scope we bail out. Global variables are late bound, the compiler doesn't keep track of which declarations for them it has seen.
+
+For local variables, the compiler does need to remember the variable exists, that's what declaring it does - it adds it to the compiler's list of variables in the current scope. We implement that using a new function
+
+ithis initializes the next available local in the compilers array of variables. it stores the variable's name and depth of the scope who owns the variable.
+
+
+Worried about the lifetime of athe string for the variable's name? The local directly stores a copy of the token struct for the identifier. Tokens store a pointer to the first character of their lexeme and lexeme's length.
+
+That pointer points into the original source string for the script or repl being compiled.
+
+As long as that string stays around during compilation, which is should - all the tokens pointing to it are fine
+
+Our implementation is fine for a greenpoint program, but what about invalid code?
+
+The instructions to work with local variables refer to them by slot index. That index is stored in a single-byte operatnd, which means the VM only supports up to 256 variables at a time
+
+If we go over that, we wouldn't be able to refer to them at runtime and the compiler would overwrite its own locals array too. Let's prevent that.
+
+The next case is trickier. Consider:
+
+var a = "first";
+var a = "second";
+
+At the top level, lox allows for redeclaring a variable with the same name as a previokus declaration because that's useful for the repl. But inside a local scope that's a pretty weird thing to do.
+
+Actually Rust allows this, and idiomatic code relies on it
+
+Note that the program above is different than if the same variable occurs deeper in the scope. That's called shadowing
+
+we can detect the error by looking in the locals thing
+
+we check all the variables in the current scope
+
+local variables are appended to the array when they're declared, which means the current scope is always the end of the array. When we declare a new variable, we start at the end and work bakcward, looking for an existing variable with the same name. If we find one in this scope, we report the error. Otherwise if we reach the beginnig of the array or a variable owned by another scope we know we've checked all of the existing variables in scope.
+
+To see if two identifiers are the same, we us e this
+
+Since we know the length of both lexemes, we check that first. If the lengths are the same, we check the characters using memcmp. To get memcmp we need an include
+
+We're able to bring variables into being. But like ghosts they linger beyond the scope where they're declared.
+
+To fix this, we need to remove them from scope once the scope ends
+
+when we pop a scope, we walk through the local array looking for variables at the scope depth we just left. We discard them by decrementing the length of the array
+
+There's a runtime component to this too. local variables occupy slots on the stack. When a local variable goes out of scope
+
+that slot is no longer needed and should be freed. So for each variable that we discard we want to emit an OPPOP instruction to pop it from the satck
+
+Using locals
+
+We can now compile and execute local variable declarations. At runtime their values are where they should be on the stack. Let's start using them. We'll do both variable access and assignment at the same time since they touch the same functions in the compiler.
+
+It intimidates me how impressively complex language systems are. Each time I feel like I have a handle on the various moving parts of it, there's another sharp injection of complexity that shakes up my foundational understanding of how it all works.
+
+Any time off from detailed work leaks all the details out of my pervue, returning the concept to the cloudy mystery it once was for me.
+
+
+Okay so I think I understand more, now the compilers keeps track of the locals in scope. What this will do is mirror the stack in what locals are held on it - and therefore should be able to mirror what exists on the vm stack
+
+By keeping track of the index, we can use the argument to find locals
+
+At runtime, we load and store locals using the stack slot index, so that's what the compiler needs to calculate after it resolves the variable.
+
+Whenever a variable is declared we append it to the locals in the compiler. That means when the first local variable is at index zero, the next one as at index one and so on 
+
+In other words, the locals array in the compiler has the exact same layout as the vms stack at runtime
+
+If we make it through the whole array without finding a variable it must not be local.
+
+In that case we return -1 to signal that it wasn't found
+
+interpreting local variables
+
+Our disassembler is incomplete without support for these two new instructions
+
+The compiler compiles local variables to direct slot access. The local variables name never leaves the compiler to make it into the chunk at all
+
+that's great for performance but not for introspection
+
+When we disassemble these instructions we can't show the variables name like we could with globals. Instead we just show the slot number
+
+so why am i confused right now?
+
+It looks like the local operations are directly accessing information in the stack.
+
+That being said, can't operations shift what's on the stack?
+
+What happens when we set a variable?
+
+We grab the variable on the stack at a specific location
+
+We assign 
+
+So global variables live in a hash table, that's accessible globally
+
+Local variables live in the stack
+
+When we set local variables, we set them on the stack
+
+Let's do an example to try to solidify the premise:
+
+{
+  var a = 4;
+  print(a);
+}
+
+When this gets compiled, locals gets set to 
+
+Okay testing the implementation, looks like there's a segfault in resolving locals
+
+Another thing that I find strange is that the locals array didn't need to be initialized
+
+At this point I trust the book much more than I trust my own judgement, what could be going on here?
+
+Current things to investigate:
+2. Segfault on GET_GLOBAL
+
+Okay so set local is for setting already existing variable
+
+Dang local variables are tough to manage
