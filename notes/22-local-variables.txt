@@ -196,6 +196,11 @@ At this point I trust the book much more than I trust my own judgement, what cou
 Current things to investigate:
 2. Segfault on GET_GLOBAL
 
+findEntry shows that indexing is working weird.
+I'm not sure how to proceed from here, a lot of the debugability of this code is pretty unpleasant
+
 Okay so set local is for setting already existing variable
 
 Dang local variables are tough to manage
+
+

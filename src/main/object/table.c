@@ -21,8 +21,6 @@ void freeTable(Table* table) {
 }
 
 static Entry* findEntry(Entry* entries, int capacity, ObjString* key) {
-    printf("capacity: %d\n", capacity);
-    printf("index: %d\n", index);
     uint32_t index = key->hash % capacity;
     Entry* tombstone = NULL;
 
