@@ -204,3 +204,25 @@ Okay so set local is for setting already existing variable
 Dang local variables are tough to manage
 
 
+Okay new starting point for 1/28
+
+It seems like findentry for global variables isn't working
+There's something messed up with the hashing function. I expect it to give a positive offset, but it's giving a negative one
+
+Okay so I had a decent idea - I created a debug directory for creating greenpoint files that I can run easily to reproduce bugs
+
+Next observation, there's a relationship between hash, capacity
+
+Okay so what's actually happnening is that the segfault is on resolving the ObString when trying to look for a global variable.
+
+Debuggin macros seems difficult
+
+What happens during compilation with getting a global variable?
+What happens when a runtime when getting a global variable
+Why is the pointer to the string 0x0? Why wouldn't it fail when trying to retrieve the string rather than failing silently
+
+What can I do to make this easier?
+
+
+1. Have the code only print once
+2. Also print out the constants
