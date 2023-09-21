@@ -56,3 +56,7 @@ build
 
 # debug directory
 debug
+
+# swap file
+*.swo
+*.swp

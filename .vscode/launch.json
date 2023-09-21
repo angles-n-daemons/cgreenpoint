@@ -1,0 +1,47 @@
+{
+    "name": "C++ Launch",
+    "type": "cppdbg",
+    "request": "launch",
+    "program": "${workspaceFolder}/build/main.out",
+    "stopAtEntry": false,
+    "customLaunchSetupCommands": [
+        {
+            "text": "target-run",
+            "description": "run target",
+            "ignoreFailures": false
+        }
+    ],
+    "launchCompleteCommand": "exec-run",
+    "osx": {
+        "MIMode": "lldb"
+    },
+    "configurations": [
+        {
+            "name": "C/C++: make build and debug active file",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main.out",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: clang build active file"
+        },
+        {
+            "name": "C/C++: debug tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/main.out",
+            "args": ["test"],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "C/C++: clang build active file"
+        }
+    ],
+    "version": "2.0.0"
+}

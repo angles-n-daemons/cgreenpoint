@@ -223,6 +223,5 @@ Why is the pointer to the string 0x0? Why wouldn't it fail when trying to retrie
 
 What can I do to make this easier?
 
-
 1. Have the code only print once
 2. Also print out the constants
