@@ -225,3 +225,112 @@ What can I do to make this easier?
 
 1. Have the code only print once
 2. Also print out the constants
+
+
+Okay so I've now a debugger running, and some of my wits about me.
+
+Seems the core issue is that tableGet is returning a fake address for local variables. It's been so long since I've touched the rest of the codebase that I'm unsure where things are
+
+I have a variable which I'd like to reference, I believe that it's a global variable failure. Can I check in at a point in which the codebase worked and move forward from there?
+
+Options to debug variable failure
+1. Try to see why tableGet is failing
+2. Check out the codebase at a time when it was working, go from there
+
+Notes to me
+
+the variable name is an invalid address (0)
+This is the result of READ_STRING()
+READ_STRING is evaluated as AS_STRING(READ_CONSTANT)
+
+AS_STRING takes a byte, and then casts it to an OBJ first, then casts it to an ObjString
+AS_CONSTANT pulls out a constant value from the vm.chunk->constants.values array and reads the next byte at the location
+
+In order to solve this I might need to know:
+- What the next byte that is pulled out is
+- What the constants look like
+
+It obviously turns into a 0, so I think it's an unset value
+
+The byte is a literal byte of code
+
+So in reading the byte code, it seems as if 
+
+
+What's challenging about this?
+
+I can't read what the constants are
+
+I can't see what the constants table is
+
+Okay though I can see the only object that's a string is the first one.
+
+What should be done from here:
+- Validate that the instruction pointer only moves one before and after reading the string
+  - Done
+- Figure out how the instruction pointer resolves to a value
+- One that happens, figure out what the constant values offset is for both the GLOBAL and SET operations
+   - DEFINE_GLOBAL (before) and after = 0
+
+
+Okay so new news, it seems as if the constant lookup is definitely wrong for OP_SET_GLOBAL.
+
+It might be worth checking out if when writing OP_SET_GLOBAL, something happens where the actual set value is wrong.
+
+How does it do this setup?
+
+New things:
+- It seems as if when the compiler is trying to add the set command to the bytecode it's creating a new constant
+
+I think this is failing on step 22.4 for using locals
+
+Let's walk it back. When the compiler is running, if it encounters a var statement it understands it's setting a new global variable.
+In order to do so it 
+
+For setting a variable, it seems as if the compiler first finds the identifier (parseVariable) which should find an identifier: variable name
+Then sets that variable in a constnat 
+
+Note:
+might help to print out the globals at runtime
+might help to also print out the constants at runtime
+- printing values (different than stack?)
+
+Definitely will help to just test this function
+
+
+It seems as if it's not totally wrong that there's duplicates of the same string in the constants table
+
+Okay so what do I know about the state of the system:
+The index for the variable should be output as the arg to this function
+This is because the "arg" is going to be the offset in the constants table
+
+Global variable names are stored in the constants table so that they can be looked up from the globals hash map in real time
+The constant that is added should also be the index of the current size
+
+Chunk.constants.count = 2
+name = Token(IDENTIFIER, 'a')
+arg = ? (should be 2)
+
+makeConstant(value)
+value = VAL_OBJECT
+obj = OBJSTRING
+next = 0
+
+Okay so it actually looks like it's creating the right value
+*(ObjString*)(value.as.obj)
+
+Issue to dig into:
+
+in namedVariable:
+a call to identifierConstant is made
+This should set arg to 2, but arg remains -1
+This could be the core of why this isn't working
+
+To do:
+- Check the function signatures of the calls in the local variables chapter
+
+Goodness this is difficult work
+
+I was redeclaring arg, effectively block scoping it
+
+I can't believe that worked. That was a pretty uncomfortable bug
