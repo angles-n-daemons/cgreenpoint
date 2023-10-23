@@ -14,6 +14,11 @@
         "type_traits": "cpp",
         "vector": "cpp",
         "chrono": "cpp",
-        "cstddef": "cpp"
+        "cstddef": "cpp",
+        "test_common.h": "c",
+        "scanner.h": "c",
+        "object.h": "c",
+        "test_local_variables.h": "c",
+        "test_variables.h": "c"
     }
 }

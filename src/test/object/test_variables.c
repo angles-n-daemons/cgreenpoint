@@ -12,8 +12,8 @@ void testInvalidAssignment() {
 }
 
 void testVariables() {
-    printf("testTable starting\n");
+    printf("testVariables starting\n");
     testSimpleVariables();
     testInvalidAssignment();
-    printf("testTable completed\n");
+    printf("testVariables completed\n");
 }

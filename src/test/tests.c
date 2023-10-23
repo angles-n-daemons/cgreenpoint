@@ -7,6 +7,7 @@
 #include "object/test_strings.h"
 #include "object/test_table.h"
 #include "object/test_variables.h"
+#include "object/test_local_variables.h"
 
 void runTests() {
 	printf("starting tests\n");
@@ -14,8 +15,9 @@ void runTests() {
 	testVM();
 	testScanner();
 	testCompiler();
-  testStrings();
+	testStrings();
 	testTable();
 	testVariables();
+	testLocalVariables();
 	printf("all tests pass\n");
 }
