@@ -1,0 +1,20 @@
+{
+  "adapters": {
+    "custom-codelldb": {
+      "extends": "CodeLLDB",
+      "command": [
+        "~/.vim/plugged/vimspector/gadgets/macos/CodeLLDB/adapter/codelldb",
+        "--port", "${unusedLocalPort}"
+      ]
+    }
+  },
+  "configurations": {
+    "CodeLLDB": {
+      "adapter": "custom-codelldb",
+      "configuration": {
+        "request": "launch",
+        "program": "${workspaceRoot}/build/main.out"
+      }
+    }
+  }
+}
