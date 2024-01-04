@@ -2,7 +2,7 @@
 
 #include "../test_common.h"
 
-void testIfElseBasic() {
+void testIfElseStatement() {
 	printf("testing if else statement\n");
 	// test just the if statement
 	runTest("if (true) print \"succeeded\";", "succeeded");
@@ -33,7 +33,7 @@ void testIfElseNested() {
 	", "succeeded");
 }
 
-void testIfElseComplexExpression() {
+void testIfComplexExpression() {
 	printf("testing if else with complex expression\n");
 
 	runTest(" \n \
@@ -47,10 +47,10 @@ void testIfElseComplexExpression() {
 	", "succeeded");
 }
 
-void testIfElse() {
+void testJumping() {
 	printf("testJumping starting\n");
-	testIfElseBasic();
+	testIfElseStatement();
 	testIfElseNested();
-	testIfElseComplexExpression();
+	testIfComplexExpression();
 	printf("testJumping completed\n");
 }
