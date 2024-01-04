@@ -8,6 +8,7 @@
 #include "object/test_table.h"
 #include "object/test_variables.h"
 #include "object/test_local_variables.h"
+#include "controlflow/test_jumping.h"
 
 void runTests() {
 	printf("starting tests\n");
@@ -19,5 +20,6 @@ void runTests() {
 	testTable();
 	testVariables();
 	testLocalVariables();
+	testJumping();
 	printf("all tests pass\n");
 }
