@@ -9,11 +9,19 @@
     }
   },
   "configurations": {
-    "CodeLLDB": {
+    "Main": {
       "adapter": "custom-codelldb",
       "configuration": {
         "request": "launch",
         "program": "${workspaceRoot}/build/main.out"
+      }
+    },
+    "Test": {
+      "adapter": "custom-codelldb",
+      "configuration": {
+        "request": "launch",
+        "program": "${workspaceRoot}/build/main.out",
+	"args": ["test"]
       }
     }
   }
