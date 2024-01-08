@@ -42,12 +42,12 @@ void writeConstant(Chunk* chunk, Value value, int line) {
         uint8_t firstByte = constant & 0xff;
         uint8_t secondByte = (constant >> 8) & 0xff;
 
-	      writeChunk(chunk, OP_CONSTANT_16, line);
-	      writeChunk(chunk, firstByte, line);
-	      writeChunk(chunk, secondByte, line);
+          writeChunk(chunk, OP_CONSTANT_16, line);
+          writeChunk(chunk, firstByte, line);
+          writeChunk(chunk, secondByte, line);
     } else {
-	      writeChunk(chunk, OP_CONSTANT, line);
-	      writeChunk(chunk, constant, line);
+          writeChunk(chunk, OP_CONSTANT, line);
+          writeChunk(chunk, constant, line);
     }
 }
 

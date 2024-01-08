@@ -11,15 +11,15 @@
 #include "controlflow/test_ifelse.h"
 
 void runTests() {
-	printf("starting tests\n");
-	testChunk();
-	testVM();
-	testScanner();
-	testCompiler();
-	testStrings();
-	testTable();
-	testVariables();
-	testLocalVariables();
-	testIfElse();
-	printf("all tests pass\n");
+    printf("starting tests\n");
+    testChunk();
+    testVM();
+    testScanner();
+    testCompiler();
+    testStrings();
+    testTable();
+    testVariables();
+    testLocalVariables();
+    testIfElse();
+    printf("all tests pass\n");
 }
