@@ -47,7 +47,7 @@ void testIfComplexExpression() {
 	", "succeeded");
 }
 
-void testJumping() {
+void testIfElse() {
 	printf("testJumping starting\n");
 	testIfElseStatement();
 	testIfElseNested();
