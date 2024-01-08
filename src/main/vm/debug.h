@@ -6,6 +6,6 @@
 void disassembleChunk(Chunk* chunk, const char* name);
 int disassembleInstruction(Chunk* chunk, int offset);
 int getLineOffset(Chunk* chunk, int offset, int count);
-void printStack();
+void printStack(Value* stack, Value* stackTop);
 
 #endif
