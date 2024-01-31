@@ -11,7 +11,7 @@ void testCompiler() {
     runTest("print 4 + 3 * 3;", "13");
     runTest("print 4 + (3 * 3);", "13");
     runTest("print 2 * 8 - 6 / 2;", "13");
-    runTest("print (-1 + 2) * 3 - -4;", "11");
+    runTest("print (-1 + 2) * 3 - -4;", "7");
     
     printf("testCompiler completed\n");
 }

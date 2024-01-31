@@ -218,7 +218,7 @@ static int resolveLocal(Compiler* compiler, Token* name) {
     for (int i = compiler->localCount - 1; i >= 0; i--) {
         Local* local = &compiler->locals[i];
         if (identifiersEqual(name, &local->name)) {
-            if (local->depth == 1) {
+            if (local->depth == -1) {
                 error("Can't read local variable in its own initializer.");
             }
             return i;

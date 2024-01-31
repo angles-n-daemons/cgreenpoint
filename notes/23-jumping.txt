@@ -1,0 +1,16 @@
+some of the previous tests have broken
+
+seems as if a few things aren't working quite right
+
+- precedence parsing (tests which expect 11 get 7 or vice versa)
+- variable assignment (getting an error for referencing a variable in it's own declaration)
+
+so much of this project has been pulling apart at the seams.
+
+I think it would have done a lot more to have setup some guards for myself upfront.
+
+There's a feeling of inadaquacy which might not be totally unwarranted. I feel as if someone else could somewhat easily resolve these issues which keep hindering progress. One step forward and a mountain of mistakes to clean up. It's much like demolition despite not trying to demolish anything. I'm trying to build. I can spend about 30 minutes right now on each issue, it's not a bad way to spend my time.
+
+Okay so it seems like it's found the right bit
+
+Now I just need to figure out why this is happening
