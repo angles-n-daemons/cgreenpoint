@@ -31,5 +31,5 @@ void testAndOr() {
     testSimpleOr();
     testCombinedAndOr();
     testAndOrWithExtraSteps();
-    printf("testAndOr completed\n");
+    printf("testAndOr completed\n\n");
 }

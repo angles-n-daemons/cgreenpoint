@@ -10,6 +10,7 @@
 #include "object/test_local_variables.h"
 #include "controlflow/test_ifelse.h"
 #include "controlflow/test_andor.h"
+#include "controlflow/test_while.h"
 
 void runTests() {
     printf("starting tests\n");
@@ -23,5 +24,6 @@ void runTests() {
     testLocalVariables();
     testIfElse();
     testAndOr();
+    testWhile();
     printf("all tests pass\n");
 }
