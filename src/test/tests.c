@@ -11,6 +11,7 @@
 #include "controlflow/test_ifelse.h"
 #include "controlflow/test_andor.h"
 #include "controlflow/test_while.h"
+#include "controlflow/test_for.h"
 
 void runTests() {
     printf("starting tests\n");
@@ -25,5 +26,6 @@ void runTests() {
     testIfElse();
     testAndOr();
     testWhile();
+    testFor();
     printf("all tests pass\n");
 }
