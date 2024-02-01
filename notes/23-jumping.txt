@@ -14,3 +14,15 @@ There's a feeling of inadaquacy which might not be totally unwarranted. I feel a
 Okay so it seems like it's found the right bit
 
 Now I just need to figure out why this is happening
+
+What a joy a little bit of patience can be. I found the issue with local variable resolution, and I fixed the numeric error becaus the expected output of the test was wrong. Now to get back to jumping.
+
+I think to some degree I understand what's happening with and_, though there's something that seems to still escape me.
+
+I forget how parse precedence works I suppose, and that leaves the big parsePrecedence function after in confusion to me
+
+Separately I don't even know where parsePrecedence is
+
+What does patch jump do again?
+
+Seems like and is pretty high on the precedence hierarchy
