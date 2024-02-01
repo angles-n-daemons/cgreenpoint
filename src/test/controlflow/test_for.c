@@ -4,7 +4,7 @@
 
 void testSimpleFor() {
     runTest("\n \
-        for (var i = 0; i < 5; i++) {\n \
+        for (var i = 0; i < 5; i = i+1) {\n \
             print i;\n \
         }\n \
     ", "0\n1\n2\n3\n4\n");
@@ -13,7 +13,7 @@ void testSimpleFor() {
 void testForMissingInitializer() {
     runTest("\n \
         var i = 0;\n \
-        for (; i < 5; i++) {\n \
+        for (; i < 5; i = i+1) {\n \
             print i;\n \
         }\n \
     ", "0\n1\n2\n3\n4\n");
@@ -22,7 +22,7 @@ void testForMissingInitializer() {
 void testForImmediatelyExits() {
     runTest("\n \
         var i = 0;\n \
-        for (; i > 5; i++) {\n \
+        for (; i > 5; i = i+1) {\n \
             print i;\n \
         }\n \
     ", "<NOTHING>");
@@ -31,11 +31,11 @@ void testForImmediatelyExits() {
 void testForGoofyCase() {
     runTest("\n \
         var i = 0;\n \
-        for (; i < 5; i++) {\n \
+        for (; i < 5; i = i+1) {\n \
             i = i+1;\n \
             print i;\n \
         }\n \
-    ", "<NOTHING>");
+    ", "1\n3\n5\n");
 }
 
 void testFor() {
