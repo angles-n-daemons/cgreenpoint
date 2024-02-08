@@ -12,6 +12,7 @@
 #include "controlflow/test_andor.h"
 #include "controlflow/test_while.h"
 #include "controlflow/test_for.h"
+#include "function/test_function.h"
 
 void runTests() {
     printf("starting tests\n");
@@ -27,5 +28,6 @@ void runTests() {
     testAndOr();
     testWhile();
     testFor();
+    testFunction();
     printf("all tests pass\n");
 }
