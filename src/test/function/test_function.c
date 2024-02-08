@@ -8,9 +8,10 @@ void testFunctionBasic() {
     fun first() {\
         var a = 1;\
         second();\
+        print a;\
         var b = 2;\
-        print a + b;\
         second();\
+        print a + b;\
     }\
     \
     fun second() {\
@@ -19,7 +20,7 @@ void testFunctionBasic() {
         print c + d;\
     }\
     \
-    first()", "\n7\n3\n7");
+    first()", "\n7\n1\n3\n7");
 }
 
 void testFunction() {
