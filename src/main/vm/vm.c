@@ -15,7 +15,6 @@ VM vm;
 static void resetStack() {
     vm.stackTop = vm.stack;
     vm.frameCount = 0;
-    // LAST LINE WRITTEN
 }
 
 static void runtimeError(const char* format, ...) {
