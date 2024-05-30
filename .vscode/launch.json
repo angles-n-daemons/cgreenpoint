@@ -17,7 +17,7 @@
     },
     "configurations": [
         {
-            "name": "C/C++: make build and debug active file",
+            "name": "C/C++: debug main file",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/main.out",
