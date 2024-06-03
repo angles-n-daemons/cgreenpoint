@@ -28,7 +28,7 @@ void testForImmediatelyExits() {
             print i;\n \
         }\n \
     ",
-          "<NOTHING>");
+          "");
 }
 
 void testForGoofyCase() {

@@ -26,7 +26,8 @@ static void runtimeError(const char *format, ...) {
   fputs("\n", stderr);
 
   CallFrame *frame = &vm.frames[vm.frameCount - 1];
-  size_t instruction = frame->ip - frame->function->chunk.code - 1;
+  size_t instruction = frame->ip - frame->function->chunk.code -
+                       1; // do i trust this?, do I know what this means?
   int line = frame->function->chunk.lines[instruction];
   fprintf(stderr, "[line %d] in script\n", line);
   resetStack();

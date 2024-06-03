@@ -6,10 +6,11 @@
 void runTest(const char *test, const char *expected) {
   printf("testing greenpoint program '%s'\n", test);
   initVM();
-  printf("======= PROGRAM OUTPUT START =======\n");
+  printf("======= PROGRAM OUTPUT  =======\n");
   interpret(test);
-  printf("======= PROGRAM OUTPUT END   =======\n");
+  printf("======= EXPECTED OUTPUT =======\n");
+  printf("%s\n", expected);
+  printf("======= END             =======\n");
   freeVM();
-  printf("expected %s\n", expected);
   printf("end test\n\n");
 }
