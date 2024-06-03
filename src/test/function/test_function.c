@@ -1,10 +1,10 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../test_common.h"
 
 void testFunctionBasic() {
-    runTest("\
+  runTest("\
     fun first() {\
         var a = 1;\
         second();\
@@ -20,11 +20,12 @@ void testFunctionBasic() {
         print c + d;\
     }\
     \
-    first()", "\n7\n1\n3\n7");
+    first()",
+          "\n7\n1\n3\n7");
 }
 
 void testFunction() {
-    printf("testFunction starting\n");
-    testFunctionBasic();
-    printf("testFunction completed\n");
+  printf("testFunction starting\n");
+  testFunctionBasic();
+  printf("testFunction completed\n");
 }

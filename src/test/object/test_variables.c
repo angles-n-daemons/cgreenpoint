@@ -2,18 +2,15 @@
 
 #include "../test_common.h"
 
-
-void testSimpleVariables() {
-    runTest("var a = 5; a = 4; print a;", "4");
-}
+void testSimpleVariables() { runTest("var a = 5; a = 4; print a;", "4"); }
 
 void testInvalidAssignment() {
-    runTest("var a = 4; b = 3; a * b = 5;", "Invalid assignment target.");
+  runTest("var a = 4; b = 3; a * b = 5;", "Invalid assignment target.");
 }
 
 void testVariables() {
-    printf("testVariables starting\n");
-    testSimpleVariables();
-    testInvalidAssignment();
-    printf("testVariables completed\n");
+  printf("testVariables starting\n");
+  testSimpleVariables();
+  testInvalidAssignment();
+  printf("testVariables completed\n");
 }

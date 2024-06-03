@@ -3,46 +3,50 @@
 #include "../test_common.h"
 
 void testSimpleFor() {
-    runTest("\n \
+  runTest("\n \
         for (var i = 0; i < 5; i = i+1) {\n \
             print i;\n \
         }\n \
-    ", "0\n1\n2\n3\n4\n");
+    ",
+          "0\n1\n2\n3\n4\n");
 }
 
 void testForMissingInitializer() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         for (; i < 5; i = i+1) {\n \
             print i;\n \
         }\n \
-    ", "0\n1\n2\n3\n4\n");
+    ",
+          "0\n1\n2\n3\n4\n");
 }
 
 void testForImmediatelyExits() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         for (; i > 5; i = i+1) {\n \
             print i;\n \
         }\n \
-    ", "<NOTHING>");
+    ",
+          "<NOTHING>");
 }
 
 void testForGoofyCase() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         for (; i < 5; i = i+1) {\n \
             i = i+1;\n \
             print i;\n \
         }\n \
-    ", "1\n3\n5\n");
+    ",
+          "1\n3\n5\n");
 }
 
 void testFor() {
-    printf("testFor starting\n");
-    testSimpleFor();
-    testForMissingInitializer();
-    testForImmediatelyExits();
-    testForGoofyCase();
-    printf("testFor completed\n\n");
+  printf("testFor starting\n");
+  testSimpleFor();
+  testForMissingInitializer();
+  testForImmediatelyExits();
+  testForGoofyCase();
+  printf("testFor completed\n\n");
 }

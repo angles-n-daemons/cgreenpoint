@@ -3,47 +3,51 @@
 #include "../test_common.h"
 
 void testSimpleWhile() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         while (i < 10) {\n \
             i = i + 1;\n \
         }\n \
         print i;\n \
-    ", "10");
+    ",
+          "10");
 
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         while (i > 10) {\n \
             i = i + 1;\n \
         }\n \
         print i;\n \
-    ", "0");
+    ",
+          "0");
 }
 
 void testWhileNoParens() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         while i < 10 {\n \
             i = i + 1;\n \
         }\n \
         print i;\n \
-    ", "Expect '(' after 'while'.");
+    ",
+          "Expect '(' after 'while'.");
 }
 
 void testWhileMissingRightParen() {
-    runTest("\n \
+  runTest("\n \
         var i = 0;\n \
         while (i < 10 {\n \
             i = i + 1;\n \
         }\n \
         print i;\n \
-    ", "Expect ')' after expression.");
+    ",
+          "Expect ')' after expression.");
 }
 
 void testWhile() {
-    printf("testWhile starting\n");
-    testSimpleWhile();
-    testWhileNoParens();
-    testWhileMissingRightParen();
-    printf("testWhile completed\n\n");
+  printf("testWhile starting\n");
+  testSimpleWhile();
+  testWhileNoParens();
+  testWhileMissingRightParen();
+  printf("testWhile completed\n\n");
 }
