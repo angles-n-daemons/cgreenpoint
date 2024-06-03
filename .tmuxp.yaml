@@ -1,0 +1,14 @@
+session_name: ui-skyline
+start_directory: ~/projects/skyline/ui
+windows:
+  - window_name: app
+    layout: main-vertical
+    panes:
+      - blank
+      - blank
+  - window_name: git
+    panes:
+      - lazygit
+  - window_name: vim
+    panes:
+      - cvim

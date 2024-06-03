@@ -60,3 +60,6 @@ debug
 # swap file
 *.swo
 *.swp
+
+# tmuxp
+!.tmuxp.yaml
