@@ -1,0 +1,17 @@
+Note:
+- We modified markInitialized 
+- Previously it referred only to global variables which could not be referenced in their initialization
+- Here they can (to support recursion)
+not sure I totally understand the above, but I'll motor on through and see if it makes any more sense
+
+
+"The trick for managing that (multiple functions nested within each other) is to create a separate compiler for each function being compiled"
+
+
+Wouldn't that mean that there would need to be a block for each function call? Sounds like that's still possible, just that each function definition requires a single compilation
+
+Globals are a part of the vm, so it seems as if referencing compiled functions in that way mostly works
+
+Nested functions are likely locals, and I'm curious what that looks like
+
+NOTE TO BRIAN: You ended at the function parameters section (just before starting) 24.4.2
