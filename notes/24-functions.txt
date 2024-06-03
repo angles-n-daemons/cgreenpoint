@@ -15,3 +15,69 @@ Globals are a part of the vm, so it seems as if referencing compiled functions i
 Nested functions are likely locals, and I'm curious what that looks like
 
 NOTE TO BRIAN: You ended at the function parameters section (just before starting) 24.4.2
+
+An infix operator occurs if the operator is found in between things
+
+fun ( 5)
+
+The ( is an infix operator, in a contrived way
+
+I'm not sure this is the clearest way to get this done, though it works
+
+
+interesting little quirk is that it seems like the function will get a window into the caller's stack
+
+In that way, the data doesn't need to be copied. This opens a few questions:
+- what if the variables values are modified in the function? They probably shouldn't be
+
+Something like this:
+
+function foo(a) {
+  a = a + 1;
+}
+
+var b = 2;
+foo(b);
+print b; // what should this print?
+
+
+both the stack and function values are values
+
+what values constitute framecount?
+
+Okay so the CallFrame has:
+- A slots value which is a pointer to the vm's stack where the function should be pulling variables from
+  - how does pop work with this?
+  - this will work on the top of the stack
+    - allocating, poping will always happen on the top of the stack
+- Separately it holds an instruction pointer to where in the caller's codebase it was
+
+
+This allows us to have multiple call frames for the same function
+
+Call fib line 2
+Call fib line 3
+
+Is just two call frames for the function
+
+Because they both have a reference to their function, they share the code 
+
+So the questions still remain, what happens to call frames, how are they referenced (this precarious frameCount - 1 seems dangerous)
+are parameters pushed onto the (kinda, yes, it seems so)
+
+so if I call something
+
+foo(1, 2, 3)
+
+The stack top will be 1, 2, 3 which will be exactly what I need for the next thing
+
+I forget how variable lookup works
+
+So it actually knows how far down on the stack it needs to go
+This stuff is complicated
+
+I think understanding all of the above, 
+
+NOTE TO BRIAN:
+
+Right before 24.5.2, running the tests have compilation issues
