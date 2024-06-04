@@ -1,5 +1,5 @@
-session_name: ui-skyline
-start_directory: ~/projects/skyline/ui
+session_name: cgreenpoint
+start_directory: ~/projects/cgreenpoint/
 windows:
   - window_name: app
     layout: main-vertical
