@@ -81,3 +81,8 @@ I think understanding all of the above,
 NOTE TO BRIAN:
 
 Right before 24.5.2, running the tests have compilation issues
+
+So it looks like the function is running into an issue because returns aren't recognized by the compiler
+
+These errors are to be expected
+
