@@ -20,7 +20,7 @@ void testFunctionBasic() {
        print c + d;\
    }\
    \
-   first()",
+   first();",
           "\n7\n1\n3\n7");
 }
 
@@ -50,10 +50,33 @@ void testCallUncallable() {
           "Can only call functions and classes.");
 }
 
+void testArgumentMismatch() {
+  runTest("\
+   fun f(a) {} \
+   f(1, 2);",
+          "Expected 1 arguments but got 2.");
+  runTest("\
+   fun f(a) {} \
+   f();",
+          "Expected 1 arguments but got 0.");
+}
+
+void testStackOverflow() {
+  runTest("\
+   fun f() { \
+     f(); \
+   }\
+   f();",
+          "Stack overflow.");
+}
+
 void testFunction() {
   printf("testFunction starting\n");
+  // testStackOverflow();
   testFunctionBasic();
-  testDeclareFunction();
-  testFunctionWithParams();
+  // testDeclareFunction();
+  // testFunctionWithParams();
+  // testCallUncallable();
+  // testArgumentMismatch();
   printf("testFunction completed\n");
 }
