@@ -82,6 +82,8 @@ void testReturnTopLevel() {
   runTest("return 123;", "Can't return from top-level code.");
 }
 
+void testNativeFunction() { runTest("print clock();", "<timestamp>"); }
+
 void testFunction() {
   printf("testFunction starting\n");
   testStackOverflow();
@@ -92,5 +94,6 @@ void testFunction() {
   testArgumentMismatch();
   testNoReturn();
   testReturnTopLevel();
+  testNativeFunction();
   printf("testFunction completed\n");
 }
