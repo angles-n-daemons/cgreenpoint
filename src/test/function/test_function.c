@@ -21,7 +21,7 @@ void testFunctionBasic() {
    }\
    \
    first();",
-          "\n7\n1\n3\n7");
+          "7\n1\n3\n7");
 }
 
 void testDeclareFunction() {
@@ -39,7 +39,7 @@ void testFunctionWithParams() {
        return a + b + c; \
    }\
    \
-   print 4 + sum(a, b, c);",
+   print 4 + sum(5, 6, 7);",
           "22");
 }
 
@@ -70,13 +70,27 @@ void testStackOverflow() {
           "Stack overflow.");
 }
 
+void testNoReturn() {
+  runTest("\
+   fun f() { \
+   }\
+   print f();",
+          "nil");
+}
+
+void testReturnTopLevel() {
+  runTest("return 123;", "Can't return from top-level code.");
+}
+
 void testFunction() {
   printf("testFunction starting\n");
-  // testStackOverflow();
+  testStackOverflow();
   testFunctionBasic();
-  // testDeclareFunction();
-  // testFunctionWithParams();
-  // testCallUncallable();
-  // testArgumentMismatch();
+  testDeclareFunction();
+  testFunctionWithParams();
+  testCallUncallable();
+  testArgumentMismatch();
+  testNoReturn();
+  testReturnTopLevel();
   printf("testFunction completed\n");
 }
