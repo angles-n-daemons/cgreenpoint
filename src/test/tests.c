@@ -6,6 +6,7 @@
 #include "controlflow/test_for.h"
 #include "controlflow/test_ifelse.h"
 #include "controlflow/test_while.h"
+#include "function/test_closure.h"
 #include "function/test_function.h"
 #include "object/test_local_variables.h"
 #include "object/test_strings.h"
@@ -27,5 +28,6 @@ void runTests() {
   testWhile();
   testFor();
   testFunction();
+  testClosure();
   printf("all tests pass\n");
 }
