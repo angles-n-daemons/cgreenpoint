@@ -12,8 +12,15 @@
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/main.out",
-      "externalConsole": true,
-      "preLaunchTask": "C/C++: clang build active file"
+      "externalConsole": true
+    },
+    {
+      "name": "Greenpoint: debug current file",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/main.out",
+      "args": ["${file}"],
+      "externalConsole": false
     },
     {
       "name": "C/C++: debug tests",
@@ -21,8 +28,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/main.out",
       "args": ["test"],
-      "externalConsole": false,
-      "preLaunchTask": "C/C++: clang build active file"
+      "externalConsole": false
     }
   ],
   "version": "2.0.0"
