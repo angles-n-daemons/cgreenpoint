@@ -1,0 +1,5 @@
+did a little work setting up testing for greenpoint files
+
+I also setup some syntax highlighting using kotlin as it has a similar syntax
+
+

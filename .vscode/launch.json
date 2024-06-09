@@ -8,13 +8,6 @@
   },
   "configurations": [
     {
-      "name": "C/C++: debug main file",
-      "type": "cppdbg",
-      "request": "launch",
-      "program": "${workspaceFolder}/build/main.out",
-      "externalConsole": true
-    },
-    {
       "name": "Greenpoint: debug current file",
       "type": "cppdbg",
       "request": "launch",
@@ -29,6 +22,13 @@
       "program": "${workspaceFolder}/build/main.out",
       "args": ["test"],
       "externalConsole": false
+    },
+    {
+      "name": "C/C++: debug main file",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/main.out",
+      "externalConsole": true
     }
   ],
   "version": "2.0.0"

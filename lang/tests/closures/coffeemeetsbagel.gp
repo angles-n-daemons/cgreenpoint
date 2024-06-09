@@ -9,3 +9,7 @@ var doughnut = makeClosure("doughnut");
 var bagel = makeClosure("doughnut");
 doughnut();
 bagel();
+
+// expected output:
+// doughnut
+// bagel
