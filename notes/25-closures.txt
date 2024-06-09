@@ -3,3 +3,8 @@ did a little work setting up testing for greenpoint files
 I also setup some syntax highlighting using kotlin as it has a similar syntax
 
 
+So it seems as if some of the discussion on this seems to describe closures not working on the stack
+
+Why wouldn't they though, if you could possibly keep the right values on the stack wouldn't they appropriately close over the values?
+
+Why do we need our own object type? why not identify closed variables and keep them on the stack? Is that what we're going to do?
