@@ -16,6 +16,19 @@ void testClosureBasic() {
           "outer");
 }
 
+void testNoGlobal() {
+  runTest("\
+   fun outer() { \
+     var x = \"outer\"; \
+     fun inner() { \
+       print x; \
+     } \
+     inner(); \
+    } \
+   outer();",
+          "inner");
+}
+
 void testCoffeeMeetsBagel() {
   runTest("\
     fun makeClosure(value) { \

@@ -5,6 +5,15 @@
 void testFunctionBasic() {
   runTest("\
    fun first() {\
+      print \"hello\";\
+   }\
+   first();",
+          "hello");
+}
+
+void testFunctionComplex() {
+  runTest("\
+   fun first() {\
        var a = 1;\
        second();\
        print a;\
@@ -85,8 +94,9 @@ void testNativeFunction() { runTest("print clock();", "<timestamp>"); }
 
 void testFunction() {
   printf("testFunction starting\n");
-  testStackOverflow();
   testFunctionBasic();
+  testFunctionComplex();
+  testStackOverflow();
   testDeclareFunction();
   testFunctionWithParams();
   testCallUncallable();

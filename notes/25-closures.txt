@@ -8,3 +8,32 @@ So it seems as if some of the discussion on this seems to describe closures not 
 Why wouldn't they though, if you could possibly keep the right values on the stack wouldn't they appropriately close over the values?
 
 Why do we need our own object type? why not identify closed variables and keep them on the stack? Is that what we're going to do?
+
+So it seems as if th enext stage in this adventure is to push closed variables onto the stack? Or to push closures rather onto the constants list
+
+Is the constants table a list?
+
+Constants is a list
+
+When reading constants, the address is pushed directly onto the code
+
+Curious. I wonder if the compiler is smart enough to de-duplicate constants
+
+So the functions themselves are pushed onto the stack
+
+After the function is pushed onto the stack, it's called by retrieving it's value on the stack
+
+When a function returns, it changes the stackTop to the start of the stack before the function was called
+
+[1, fn, 5, 10]
+(5 and 10 are arguments)
+
+stacktop would have to be fn
+
+Though I'm not totally sure
+
+Okay so yeah confirmed, after the function returns the stackTop goes to the value right before the function in the stack
+
+In the above example, after the return the stackTop would be 1
+
+
