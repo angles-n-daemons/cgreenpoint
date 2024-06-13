@@ -326,9 +326,6 @@ static InterpretResult run() {
         return INTERPRET_OK;
       }
       vm.stackTop = frame->slots;
-      printf("after\n");
-      printValue(peek(-1));
-      printf("\n");
       push(result);
       frame = &vm.frames[vm.frameCount - 1];
       break;
