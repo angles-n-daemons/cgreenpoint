@@ -1,5 +1,132 @@
-fair f(x: int, y: int): int {
-	x = 
+Features:
+ - imports also declare handles
+ - can import a whole module or just a piece
+ - can rename imports
+ - variables
+   - global and local
+   - closures and upvalues
+   - constants, non-constant as default
+ - functions
+   - lambda and traditional syntax similar
+   - allow for arbitrary argument passthrough?
+ - objects
+   - spreading
+   - destructuring, implicit key setting
+ - lists
+ - strings
+ - classes
+   - constructor args at top
+   - init optional
+   - subclassing by colon
+   - me keyword references instance
+ - loops
+   - syntax for range (possibly same as python)
+ - modules
+   - lua style return for modules
+
+import src.a.b // import a whole module
+import src.a.b.Thing // import an export from a module
+import src.a.b.Thing as MyThing // name an import
+// inits not required
+
+const MY_CONSTANT = 5;
+
+// expressions implicitly end at the end of a line
+fn fair(x, y) {
+	return x
 }
 
-fair(1, 5)
+// class definitions are simple enough
+// keyword arguments for all calls / parameters
+class Person(name, job=nil) {
+	init {
+		// string concat is reasonable
+		me.card = name + ' ' + job
+	}
+	fn call(friend) {
+		print('hi ', friend.name, ' it's ', me.name)
+	}
+}
+
+// first class functions
+fn wrap_with_print(f) {
+	// passing args through
+	return fn(...args) {
+		print(f(args))
+	}
+}
+
+// labmdas are helpful for omission of brackets
+// parentheses allow for destructuring
+wrap_with_print(fn(a, b): a * b)
+
+// function colon syntax compiles the next expression
+fn bar(x, y): x - y
+// brackets denote a function with a block body
+fn baz(x, y) {
+	z = x - y
+	return z + 8
+}
+
+a = 1
+b = 2
+smol = { x: 1 }
+
+obj = {
+   ...smol, // javascript style spread
+   a, // javascript style 
+   c: b,
+   d: 4,
+}
+
+// exports are explicit
+return {
+	Person,
+}
+
+import net.http.Router
+import net.http.AppType
+
+// new keyword not needed
+const router = Router(prefix='/person', appType=AppType.JSON)
+
+// can return a response object
+router.get('/<id>', fn(req) {
+	return Resp(Status.SUCCESS, {});
+});
+
+// can return a response object
+router.get('/<id>', fn(req) {
+	return Resp(Status.SUCCESS, {});
+});
+
+// can return a response object
+router.post('/<id>', fn(req) {
+	const name = req.body.name;
+	return Resp(Status.SUCCESS, {});
+});
+
+// A web prototyping language
+class PersonRouter(controller: PersonController): Router {
+	init {
+		super(prefix='/person', appType=AppType.JSON)
+		// allow for super classing
+	}
+	fn getPerson(req) {
+		try {
+			return me.controller.find(req.query.id);
+		} catch(e) {
+			return Resp(500, {error: "unable to find that guy"})
+		}
+	}
+}
+
+
+return PersonRouter;
+
+-- multiple imports like javascript
+-- brackets not needed
+import Router, AppType from net.http.Router
+import src.route.PersonRouter
+
+I can implement a subset of this in golang
