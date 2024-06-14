@@ -113,7 +113,29 @@ greenpoint code:
 0010    | OP_RETURN
 
 
-
 okay so at this point the count of code is 4
 
 byte for OP_GET_LOCAL is 0x06
+
+Both issues were that I was to be returning -1 from resolveClosure when I instead returned 1
+
+Need to be more careful about that
+
+Issue now is that the application gets to freeObjects and it has a segmentation fault
+
+Could be with freeObject getting called for something
+
+Seems to be related to closure allocation and deallocation
+
+A helpful way to see the issue is to attach a debugger to the place where freeObjects(vm.objects) is called, then to inspect the object.type and next.type in the loop
+
+
+Next thing perhaps to look at is the closure allocation to see what its next value is when set
+
+The memory addresses for these types are coming up DEAD (which seems to indicate they've been freed)
+
+I was meant to use ALLOCATE(ObjUpvalue, count) instead of ALLOCATE_OBJ
+
+By tripping myself up here I was allocating an unknown type, perhaps the wrong type
+
+Man C errors are really challenging to debug

@@ -12,6 +12,7 @@
   (type *)allocateObject(sizeof(type), objectType)
 
 static Obj *allocateObject(size_t size, ObjType type) {
+  Obj *zObj = NULL;
   Obj *object = (Obj *)reallocate(NULL, 0, size);
   object->type = type;
   object->next = vm.objects;
@@ -20,7 +21,7 @@ static Obj *allocateObject(size_t size, ObjType type) {
 }
 
 ObjClosure *newClosure(ObjFunction *function) {
-  ObjUpvalue **upvalues = ALLOCATE_OBJ(ObjUpvalue *, function->upvalueCount);
+  ObjUpvalue **upvalues = ALLOCATE(ObjUpvalue *, function->upvalueCount);
   for (int i = 0; i < function->upvalueCount; i++) {
     upvalues[i] = NULL;
   }
