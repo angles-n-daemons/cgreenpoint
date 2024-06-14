@@ -77,6 +77,38 @@ void run(int argc, const char *argv[]) {
   freeVM();
 }
 
+void printOpCodes() {
+  printf("%x OP_CONSTANT\n", OP_CONSTANT);
+  printf("%x OP_CONSTANT_16\n", OP_CONSTANT_16);
+  printf("%x OP_NIL\n", OP_NIL);
+  printf("%x OP_TRUE\n", OP_TRUE);
+  printf("%x OP_FALSE\n", OP_FALSE);
+  printf("%x OP_POP\n", OP_POP);
+  printf("%x OP_GET_LOCAL\n", OP_GET_LOCAL);
+  printf("%x OP_SET_LOCAL\n", OP_SET_LOCAL);
+  printf("%x OP_GET_UPVALUE\n", OP_GET_UPVALUE);
+  printf("%x OP_SET_UPVALUE\n", OP_SET_UPVALUE);
+  printf("%x OP_GET_GLOBAL\n", OP_GET_GLOBAL);
+  printf("%x OP_SET_GLOBAL\n", OP_SET_GLOBAL);
+  printf("%x OP_DEFINE_GLOBAL\n", OP_DEFINE_GLOBAL);
+  printf("%x OP_EQUAL\n", OP_EQUAL);
+  printf("%x OP_GREATER\n", OP_GREATER);
+  printf("%x OP_LESS\n", OP_LESS);
+  printf("%x OP_ADD\n", OP_ADD);
+  printf("%x OP_SUBTRACT\n", OP_SUBTRACT);
+  printf("%x OP_MULTIPLY\n", OP_MULTIPLY);
+  printf("%x OP_DIVIDE\n", OP_DIVIDE);
+  printf("%x OP_NOT\n", OP_NOT);
+  printf("%x OP_NEGATE\n", OP_NEGATE);
+  printf("%x OP_PRINT\n", OP_PRINT);
+  printf("%x OP_JUMP\n", OP_JUMP);
+  printf("%x OP_JUMP_IF_FALSE\n", OP_JUMP_IF_FALSE);
+  printf("%x OP_LOOP\n", OP_LOOP);
+  printf("%x OP_CALL\n", OP_CALL);
+  printf("%x OP_CLOSURE\n", OP_CLOSURE);
+  printf("%x OP_RETURN\n", OP_RETURN);
+}
+
 int main(int argc, const char *argv[]) {
   if (argc > 1 && strcmp("test", argv[1]) == 0) {
     runTests();

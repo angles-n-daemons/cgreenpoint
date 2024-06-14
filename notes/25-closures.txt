@@ -36,4 +36,84 @@ Okay so yeah confirmed, after the function returns the stackTop goes to the valu
 
 In the above example, after the return the stackTop would be 1
 
+greenpoint old code
+== inner ==
+0000   14 OP_GET_UPVALUE      0
+0002    | OP_PRINT
+0003   15 OP_NIL
+0004    | OP_RETURN
+== outer ==
+0000   12 OP_CONSTANT         0 'outside'
+0002   15 OP_CLOSURE       1 <fn inner>
+0004      |                     local 2
+-- missing OP_GET_LOCAL
+0006    | OP_CALL             0
+0008    | OP_POP
+0009   17 OP_NIL
+0010    | OP_RETURN
+== <script> ==
+0000   17 OP_CLOSURE       1 <fn outer>
+0002      |                     local 0
+-- remove 0004   18 OP_GET_UPVALUE      1 SHOULD NOT BE HERE
+-- missing OP_DEFINE_GLOBAL
+-- missing OP_GET_GLOBAL
+0006    | OP_CALL             0
+0008    | OP_POP
+0009   19 OP_NIL
+0010    | OP_RETURN
 
+
+
+lox compiler code:
+== inner ==
+0000    4 OP_GET_UPVALUE      0
+0002    | OP_PRINT
+0003    5 OP_NIL
+0004    | OP_RETURN
+== outer ==
+0000    2 OP_CONSTANT         0 'outside'
+0002    5 OP_CLOSURE          1 <fn inner>
+0004      |                     local 1
+0006    6 OP_GET_LOCAL        2
+0008    | OP_CALL             0
+0010    | OP_POP
+0011    7 OP_NIL
+0012    | OP_RETURN
+== <script> ==
+0000    7 OP_CLOSURE          1 <fn outer>
+0002    | OP_DEFINE_GLOBAL    0 'outer'
+0004    8 OP_GET_GLOBAL       2 'outer'
+0006    | OP_CALL             0
+0008    | OP_POP
+0009    9 OP_NIL
+0010    | OP_RETURN
+
+greenpoint code:
+== inner ==
+0000   14 OP_GET_UPVALUE      0
+0002    | OP_PRINT
+0003   15 OP_NIL
+0004    | OP_RETURN
+== outer ==
+0000   12 OP_CONSTANT         0 'outside'
+0002   15 OP_CLOSURE       1 <fn inner>
+0004      |                     local 1
+0006   16 OP_GET_LOCAL        2
+0008    | OP_CALL             0
+0010    | OP_POP
+0011   17 OP_NIL
+0012    | OP_RETURN
+== <script> ==
+0000   17 OP_CLOSURE       1 <fn outer>
+0002    | OP_DEFINE_GLOBAL    0 'outer'
+0004   18 OP_GET_UPVALUE      1
+0006    | OP_CALL             0
+0008    | OP_POP
+0009   19 OP_NIL
+0010    | OP_RETURN
+
+
+
+okay so at this point the count of code is 4
+
+byte for OP_GET_LOCAL is 0x06
