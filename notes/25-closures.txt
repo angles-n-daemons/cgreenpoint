@@ -139,3 +139,5 @@ I was meant to use ALLOCATE(ObjUpvalue, count) instead of ALLOCATE_OBJ
 By tripping myself up here I was allocating an unknown type, perhaps the wrong type
 
 Man C errors are really challenging to debug
+
+Start at 25.4, last place left off
