@@ -8,6 +8,7 @@
 #include "controlflow/test_while.h"
 #include "function/test_closure.h"
 #include "function/test_function.h"
+#include "gc/test_gc.h"
 #include "object/test_local_variables.h"
 #include "object/test_strings.h"
 #include "object/test_table.h"
@@ -29,5 +30,6 @@ void runTests() {
   testFor();
   testFunction();
   testClosure();
+  testGC();
   printf("all tests pass\n");
 }

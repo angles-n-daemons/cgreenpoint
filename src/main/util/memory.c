@@ -27,6 +27,9 @@ void *reallocate(void *pointer, size_t oldSize, size_t newSize) {
 }
 
 static void freeObject(Obj *object) {
+#ifdef DEBUG_LOG_GC
+  printf("%p free type %d\n", (void *)object, object->type);
+#endif
   switch (object->type) {
   case OBJ_CLOSURE: {
     ObjClosure *closure = (ObjClosure *)object;
@@ -57,10 +60,18 @@ static void freeObject(Obj *object) {
   }
 }
 
+void markRoots() {
+  for (Value *slot = vm.stack; slot < vm.stackTop; slot++) {
+    // markValue(*slot);
+    // LAST LINE
+  }
+}
+
 void collectGarbage() {
 #ifdef DEBUG_LOG_GC
   printf("-- gc begin\n");
 #endif
+  markRoots();
 #ifdef DEBUG_LOG_GC
   printf("-- gc end\n");
 #endif
