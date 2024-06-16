@@ -1,10 +1,20 @@
 #include <stdlib.h>
 
-#include "../vm/vm.h"
-
 #include "memory.h"
 
+#include "../vm/vm.h"
+
+#ifdef DEBUG_LOG_GC
+#include "../vm/debug.h"
+#include <stdio.h>
+#endif
+
 void *reallocate(void *pointer, size_t oldSize, size_t newSize) {
+  if (newSize > oldSize) {
+#ifdef DEBUG_STRESS_GC
+    collectGarbage();
+#endif
+  }
   if (newSize == 0) {
     free(pointer);
     return NULL;
@@ -45,6 +55,15 @@ static void freeObject(Obj *object) {
     break;
   }
   }
+}
+
+void collectGarbage() {
+#ifdef DEBUG_LOG_GC
+  printf("-- gc begin\n");
+#endif
+#ifdef DEBUG_LOG_GC
+  printf("-- gc end\n");
+#endif
 }
 
 void freeObjects() {

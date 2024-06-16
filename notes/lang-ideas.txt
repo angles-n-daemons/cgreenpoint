@@ -18,11 +18,29 @@ Features:
    - constructor args at top
    - init optional
    - subclassing by colon
-   - me keyword references instance
+   - my keyword references instance
  - loops
    - syntax for range (possibly same as python)
  - modules
    - lua style return for modules
+ - stdlib
+   - net
+     - Easy setting up of routers, server, handling of web requests
+       - requires only to return a thing
+     - Easy outbound web requests
+     - Built in db protocols
+     - Waiting is the default, coroutines extend functionality
+     - Server by default sets up a coroutine for each web request
+
+fn waits() {
+  x = get_thing() // io bound operation
+}
+
+// don't communicate by sharing memory, share memory by communicating
+fn doesntwait() {
+  go get_thing(x)
+}
+
 
 import src.a.b // import a whole module
 import src.a.b.Thing // import an export from a module
