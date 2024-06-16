@@ -19,14 +19,14 @@ void testClosureBasic() {
 void testNoGlobal() {
   runTest("\
    fun outer() { \
-     var x = \"outer\"; \
+     var x = \"closed\"; \
      fun inner() { \
        print x; \
      } \
      inner(); \
     } \
    outer();",
-          "inner");
+          "closed");
 }
 
 void testCoffeeMeetsBagel() {
@@ -44,9 +44,32 @@ void testCoffeeMeetsBagel() {
           "doughnut\nbagel");
 }
 
+void testClosedUpvalues() {
+  runTest("\
+    var globalSet; \
+    var globalGet; \
+     \
+    fun main() { \
+      var a = \"initial\"; \
+     \
+      fun set() { a = \"updated\"; } \
+      fun get() { print a; } \
+     \
+      globalSet = set; \
+      globalGet = get; \
+    } \
+     \
+    main(); \
+    globalSet(); \
+    globalGet();",
+          "doughnut\nbagel");
+}
+
 void testClosure() {
   printf("testClosure starting\n");
   testClosureBasic();
+  testNoGlobal();
   testCoffeeMeetsBagel();
+  testClosedUpvalues();
   printf("testClosure completed\n");
 }
