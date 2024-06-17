@@ -17,6 +17,10 @@ static Obj *allocateObject(size_t size, ObjType type) {
   object->type = type;
   object->next = vm.objects;
   vm.objects = object;
+#ifdef DEBUG_LOG_GC
+  printf("%p allocate %zu for %d\n", (void *)object, size, type);
+#endif
+
   return object;
 }
 
@@ -95,6 +99,8 @@ ObjString *takeString(char *chars, int length) {
 ObjUpvalue *newUpvalue(Value *slot) {
   ObjUpvalue *upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
   upvalue->location = slot;
+  upvalue->closed = NIL_VAL;
+  upvalue->next = NULL;
   return upvalue;
 }
 

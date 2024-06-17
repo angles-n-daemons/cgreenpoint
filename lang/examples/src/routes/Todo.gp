@@ -2,7 +2,7 @@ import Router, AppType from net.http
 import GET, POST, DELETE from net.http.Methods
 import net.http.Router
 
-return class TodoRouter: Router {
+return class(controller: Controller): Router {
     init {
          super(prefix='/todo', appType=AppType.XML)
     }
@@ -15,7 +15,6 @@ return class TodoRouter: Router {
 
     @POST('/')
     fn createPerson(req) {
-        name = req.body.name
-        name = req.body.name
+        return my.controller.get(req.body.id)
     }
 }
