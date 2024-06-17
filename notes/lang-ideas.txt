@@ -122,6 +122,17 @@ class PersonRouter(controller: PersonController): Router {
 }
 
 
+// ternaries
+const person = if (5 > 3) {
+    if (8) {
+	   juice
+    else {
+	   hamburger
+    }
+} else {
+  apple
+}
+
 return PersonRouter;
 
 -- multiple imports like javascript
