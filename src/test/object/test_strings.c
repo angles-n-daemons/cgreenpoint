@@ -21,7 +21,7 @@ void testStrings() {
   runTest("print \"ello muppet\" == \"chello poppet\";", "false");
   runTest("print \"st\" + \"ri\" + \"ng\";", "\"string\"");
 
-  // these break with garbage collection as they don't reset the vm
+  // these break with garbage collection, i'm not sure why
   // testHash("test", 4, -1345293851);
   // testHash("banana ", 7, -502071984);
   // testHash("banana", 7, -1038955792);

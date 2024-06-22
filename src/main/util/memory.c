@@ -154,11 +154,7 @@ static void traceReferences() {
 static void sweep() {
   Obj *previous = NULL;
   Obj *object = vm.objects;
-  int i = 0;
   while (object != NULL) {
-    printf("sweeping %d\n", i);
-    i++;
-    printf("%p\n", object);
     if (object->isMarked) {
       object->isMarked = false;
       previous = object;
