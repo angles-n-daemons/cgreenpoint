@@ -105,6 +105,10 @@ static void freeObject(Obj *object) {
   }
   case OBJ_FUNCTION: {
     ObjFunction *function = (ObjFunction *)(object);
+    if (function != NULL && function->name != NULL &&
+        function->name->chars != NULL) {
+      printf("freeing %s\n", function->name->chars);
+    }
     freeChunk(&function->chunk);
     FREE(ObjFunction, object);
     break;
