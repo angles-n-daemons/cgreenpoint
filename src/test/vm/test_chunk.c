@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "../../main/common.h"
 #include "../../main/vm/chunk.h"
 #include "../../main/vm/debug.h"
+#include "../../main/vm/vm.h"
 
 void testConstant() {
   Chunk chunk;
@@ -54,7 +54,9 @@ void testConstant16() {
 
 void testChunk() {
   printf("testChunk starting\n");
+  initVM();
   testConstant();
   testConstant16();
+  freeVM();
   printf("testChunk completed\n");
 }
