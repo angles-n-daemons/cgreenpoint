@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "class/test_class.h"
 #include "compiler/test_compiler.h"
 #include "compiler/test_scanner.h"
 #include "controlflow/test_andor.h"
@@ -31,5 +32,6 @@ void runTests() {
   testFunction();
   testClosure();
   testGC();
+  testClass();
   printf("all tests pass\n");
 }

@@ -1,0 +1,11 @@
+For classes, we define the variable before the body. That way, users can refer to the containing class inside the bodies of its own methods. That's useful for things like factory methods that produce new instances of the class
+
+I think this kind of makes sense, does this mean that functions cannot operate recursively in greenpoint?
+
+For classes, all information is stored on a table within the class.
+
+Class definitions have pointers to their own class definition, and then to fields on the class (which makes sense)
+
+In the VM, all object instances are the same type ObjInstance. They have a klass pointer which is the same type of ObjClass and the only difference they have are the fields, code, and names that compose them
+
+Why macros instaed of functions?
