@@ -19,3 +19,37 @@ What would happen if I changed the peeks into pops?
 Does return pop off things?
 
 Seems to push itself down to where the frame began
+
+The way that the vm treats methods different than regular functions is with the OP_METHOD op code.
+
+I assume this binds the method to the 
+
+So the dot operator does what we want here. If there's an equal, we try to set it. Otherwise It's pushed onto the stack.
+
+function mystuff() {
+	var x = 3;
+	class ZeClass {
+		amethod() {
+			print this.val + x;
+		}
+	}
+	return ZeClass;
+}
+
+var aclass = mystuff();
+var inst = aclass();
+inst.val = 8;
+inst.amethod();
+
+New machinery is required for binding calls
+We can't simply call the function, as we need to know which object is bound to it
+
+Tracking this around, when a call is made, the method is pushed onto the stack
+
+I suppose we need this in either case?
+
+A little stuck, unsure if this keyword should be working after the last changes
+
+Some of the recent changes were confusing. Why did we add a TYPE_METHOD if it isn't used anywhere. It seems as though our local->name  became this but it couldn't be looked up.
+
+Investigate the latter
