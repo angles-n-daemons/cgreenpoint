@@ -404,27 +404,33 @@ static InterpretResult run() {
       break;
     }
     case OP_SET_PROPERTY: {
-      // peek or pop?
-      Value receiver = peek(1);
-      bool isInstance = IS_OBJ(receiver) && OBJ_TYPE(receiver) == OBJ_INSTANCE;
+      if (!IS_INSTANCE(peek(1))) {
+        runtimeError("Only instances have properties.");
+        return INTERPRET_RUNTIME_ERROR;
+      }
       ObjString *name = READ_STRING();
-      ObjInstance *instance = AS_INSTANCE(receiver);
-      tableSet(&instance->fields, name, peek(0));
-      pop();
+      ObjInstance *instance = AS_INSTANCE(peek(1));
+      Value value = pop();
+      tableSet(&instance->fields, name, value);
+      pop(); // pop instance
+      push(value);
       break;
     }
     case OP_GET_PROPERTY: {
-      ObjString *name = READ_STRING();
-      Value receiver = peek(0);
-      bool isInstance = IS_OBJ(receiver) && OBJ_TYPE(receiver) == OBJ_INSTANCE;
-      ObjInstance *instance = AS_INSTANCE(receiver);
-      Value value;
-      if (!tableGet(&instance->fields, name, &value)) {
-        runtimeError("Unknown field '%s'", name->chars);
+      if (!IS_INSTANCE(peek(0))) {
+        runtimeError("Only instances have properties.");
         return INTERPRET_RUNTIME_ERROR;
       }
-      push(value);
-      break;
+      ObjInstance *instance = AS_INSTANCE(peek(0));
+      ObjString *name = READ_STRING();
+      Value value;
+      if (tableGet(&instance->fields, name, &value)) {
+        pop();
+        push(value);
+        break;
+      }
+      runtimeError("Undefined property '%s'", name->chars);
+      return INTERPRET_RUNTIME_ERROR;
     }
     }
   }
