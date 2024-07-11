@@ -9,3 +9,13 @@ Class definitions have pointers to their own class definition, and then to field
 In the VM, all object instances are the same type ObjInstance. They have a klass pointer which is the same type of ObjClass and the only difference they have are the fields, code, and names that compose them
 
 Why macros instaed of functions?
+
+Seems as if these days the stack is growing unnecessarily. Does it mean that memory will leak? does it mean that things will fail?
+
+Why does a get, not pop something off the stack. It seems counter intuitive to me.
+
+What would happen if I changed the peeks into pops?
+
+Does return pop off things?
+
+Seems to push itself down to where the frame began

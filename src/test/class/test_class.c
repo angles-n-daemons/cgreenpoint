@@ -11,8 +11,19 @@ void testClassSimple() {
           "Brioche\nBrioche instance");
 }
 
+void testClassFields() {
+  runTest(" \
+    class Pie {} \
+    var apple = Pie(); \
+    apple.filling = \"apples\"; \
+    print apple.filling; \
+  ",
+          "apples");
+}
+
 void testClass() {
   printf("testClass starting\n");
   testClassSimple();
+  testClassFields();
   printf("testClass completed\n");
 }

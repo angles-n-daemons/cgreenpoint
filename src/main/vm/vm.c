@@ -110,7 +110,6 @@ static bool call(ObjClosure *closure, int argCount) {
 }
 
 static bool callValue(Value callee, int argCount) {
-  bool isFunction = IS_OBJ(callee) && OBJ_TYPE(callee) == OBJ_FUNCTION;
   if (IS_OBJ(callee)) {
     switch (OBJ_TYPE(callee)) {
     case OBJ_CLASS: {
@@ -402,6 +401,29 @@ static InterpretResult run() {
     }
     case OP_CLASS: {
       push(OBJ_VAL(newClass(READ_STRING())));
+      break;
+    }
+    case OP_SET_PROPERTY: {
+      // peek or pop?
+      Value receiver = peek(1);
+      bool isInstance = IS_OBJ(receiver) && OBJ_TYPE(receiver) == OBJ_INSTANCE;
+      ObjString *name = READ_STRING();
+      ObjInstance *instance = AS_INSTANCE(receiver);
+      tableSet(&instance->fields, name, peek(0));
+      pop();
+      break;
+    }
+    case OP_GET_PROPERTY: {
+      ObjString *name = READ_STRING();
+      Value receiver = peek(0);
+      bool isInstance = IS_OBJ(receiver) && OBJ_TYPE(receiver) == OBJ_INSTANCE;
+      ObjInstance *instance = AS_INSTANCE(receiver);
+      Value value;
+      if (!tableGet(&instance->fields, name, &value)) {
+        runtimeError("Unknown field '%s'", name->chars);
+        return INTERPRET_RUNTIME_ERROR;
+      }
+      push(value);
       break;
     }
     }
