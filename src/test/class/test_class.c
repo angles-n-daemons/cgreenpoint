@@ -110,6 +110,18 @@ void testClassMethodThisReceiver() {
           "Nested instance");
 }
 
+void testClassThisGlobal() {
+  runTest("print this;", "Can't use 'this' outside of a class.");
+}
+
+void testClassThisGlobalFunction() {
+  runTest(" \
+    fun notMethod() { \
+      print this; \
+    }",
+          "Can't use 'this' outside of a class.");
+}
+
 void testClass() {
   printf("testClass starting\n");
   testClassSimple();
@@ -120,5 +132,7 @@ void testClass() {
   testClassMethodWithParams();
   testClassMethodBinding();
   testClassMethodThisReceiver();
+  testClassThisGlobal();
+  testClassThisGlobalFunction();
   printf("testClass completed\n");
 }
