@@ -122,6 +122,32 @@ void testClassThisGlobalFunction() {
           "Can't use 'this' outside of a class.");
 }
 
+void testClassInit() {
+  runTest(" \
+    class Breakfast { \
+      init(protein, drink) { \
+        this.protein = protein; \
+        this.drink = drink; \
+      } \
+    } \
+ \
+    var english = Breakfast(\"bangers\", \"tea\"); \
+    print(english.drink);",
+          "tea");
+}
+
+void testClassInitReturn() {
+  runTest(" \
+    class Breakfast { \
+      init() { \
+        return this; \
+      } \
+    } \
+ \
+    Breakfast();",
+          "Can't return a value from an initializer.");
+}
+
 void testClass() {
   printf("testClass starting\n");
   testClassSimple();
@@ -134,5 +160,7 @@ void testClass() {
   testClassMethodThisReceiver();
   testClassThisGlobal();
   testClassThisGlobalFunction();
+  testClassInit();
+  testClassInitReturn();
   printf("testClass completed\n");
 }
