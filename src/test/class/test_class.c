@@ -148,6 +148,24 @@ void testClassInitReturn() {
           "Can't return a value from an initializer.");
 }
 
+void testClassInvokeField() {
+  runTest(" \
+  class Oops { \
+    init() { \
+      fun f() { \
+        print \"not a method\"; \
+      } \
+   \
+      this.field = f; \
+    } \
+  } \
+   \
+  var oops = Oops(); \
+  oops.field(); \
+          ",
+          "not a method");
+}
+
 void testClass() {
   printf("testClass starting\n");
   testClassSimple();
@@ -162,5 +180,6 @@ void testClass() {
   testClassThisGlobalFunction();
   testClassInit();
   testClassInitReturn();
+  testClassInvokeField();
   printf("testClass completed\n");
 }
