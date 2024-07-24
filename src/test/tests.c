@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "class/test_class.h"
+#include "class/test_inheritance.h"
 #include "compiler/test_compiler.h"
 #include "compiler/test_scanner.h"
 #include "controlflow/test_andor.h"
@@ -33,5 +34,6 @@ void runTests() {
   testClosure();
   testGC();
   testClass();
+  testInheritance();
   printf("all tests pass\n");
 }
