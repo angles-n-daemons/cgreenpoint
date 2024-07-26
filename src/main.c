@@ -1,3 +1,4 @@
+#include "bench/bench.h"
 #include "main/common.h"
 #include "main/vm/chunk.h"
 #include "main/vm/debug.h"
@@ -112,6 +113,8 @@ void printOpCodes() {
 int main(int argc, const char *argv[]) {
   if (argc > 1 && strcmp("test", argv[1]) == 0) {
     runTests();
+  } else if (argc > 1 && strcmp("bench", argv[1]) == 0) {
+    runBench();
   } else {
     run(argc, argv);
   }
