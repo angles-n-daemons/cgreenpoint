@@ -18,6 +18,7 @@ class Zoo {
 var zoo = Zoo();
 var sum = 0;
 var start = clock();
+print 'starting zoo benchmark';
 while (sum < 100000000) {
   sum = sum + zoo.ant()
             + zoo.banana()

@@ -708,7 +708,8 @@ static void method() {
   uint8_t constant = identifierConstant(&parser.previous);
 
   FunctionType type = TYPE_METHOD;
-  if (parser.previous.length == 4 && memcmp(parser.previous.start, "this", 4)) {
+  if (parser.previous.length == 4 &&
+      memcmp(parser.previous.start, "init", 4) == 0) {
     type = TYPE_INITIALIZER;
   }
   function(type);
