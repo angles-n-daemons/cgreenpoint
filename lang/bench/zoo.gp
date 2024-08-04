@@ -18,7 +18,7 @@ class Zoo {
 var zoo = Zoo();
 var shouldContinue = true;
 var sum = 0;
-var batch = 0;
+var batches = 0;
 var start = clock();
 print "starting zoo benchmark";
 while (shouldContinue) {
@@ -30,11 +30,11 @@ while (shouldContinue) {
                 + zoo.grass()
                 + zoo.mouse();
   }
-  print t - start > 100000;
-  if (clock() - start > 10000) {
+  batches = batches + 1;
+  if (clock() - start > 1) {
     shouldContinue = false;
   }
 }
 
 print clock() - start;
-print batch;
+print batches;
