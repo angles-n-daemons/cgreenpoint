@@ -1,0 +1,43 @@
+After a while fiddling with trying to benchmark I've found a sequence of things that seems to work:
+
+# compiling with debug instructions which are usable by valgrind
+To create a binary which compiles a binary with a dSYM directory, run the following:
+
+`clang -g $(find . -name "*.c") -o main`
+
+You also need to compile your own version of valgrind-macos. To do so clone the repo:
+`git clone https://github.com/LouisBrunner/valgrind-macos.git`
+
+Around line 1500 in debuginfo.c, you'll need to change the condition to include a main file check
+
+```
+   bool isMainFile = VG_(strncmp)(di->fsm.filename, "./main", 6) == 0;
+   VG_(message)(Vg_UserMsg, "is main file: %s\n", isMainFile ? "true" : "false");
+
+   vg_assert(!di->have_dinfo);
+   if (isMainFile || (di->fsm.have_rx_map &&
+       di->fsm.rw_map_count == rw_load_count)) {
+```
+
+From there you can build your own valgrind:
+`./autogen.sh`
+`./configure`
+`make`
+
+And then after you can use it to run callgrind:
+
+`path/to/compiled/valgrind --dsymutil=yes --tool=callgrind --simulate-cache=yes <executable>`
+
+From there, you can get the header:
+
+`callgrind_annotate --auto=yes | head -n 100`
+
+You can get the functions which are within your source
+
+`callgrind_annotate --auto=yes | grep src`
+
+You can look at a line by line breakdown of a given function
+
+`callgrind_annotate --auto=yes | grep -e -A 50 'static .* <function>'`
+
+and there's a bug in my code
